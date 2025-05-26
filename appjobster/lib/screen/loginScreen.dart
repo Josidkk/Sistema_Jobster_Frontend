@@ -3,6 +3,7 @@ import 'package:jobster/services/usuarioService.dart';
 import 'package:flutter/material.dart';
 import '../screen/principalScreen.dart';
 import 'restablecerContrasenaScreen.dart';
+import '../main.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -49,7 +50,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => const principalScreen()),
+            MaterialPageRoute(
+              builder: (context) => const MainNavigationScreen(),
+            ),
           );
         } else {
           setState(() {
