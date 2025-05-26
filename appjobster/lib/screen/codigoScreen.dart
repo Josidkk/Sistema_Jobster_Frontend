@@ -71,7 +71,7 @@ class _CodigoScreenState extends State<CodigoScreen> {
         child: SafeArea(
           child: Center(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40),
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 10000),
               child: Container(
                 padding: const EdgeInsets.all(24.0),
                 decoration: BoxDecoration(
