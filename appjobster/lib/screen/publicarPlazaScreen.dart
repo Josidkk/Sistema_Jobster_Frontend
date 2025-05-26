@@ -187,7 +187,8 @@ class _PublicarPlazaScreenState extends State<PublicarPlazaScreen> {
           //   fit: BoxFit.cover,
           // ),
 
-          color: Color.fromARGB(255, 255, 255, 255)
+          color: Color.fromARGB(255, 255, 134, 42)
+          // color: Color.fromARGB(255, 225, 129, 19)
         ),
         child: SafeArea(
           child: Center(

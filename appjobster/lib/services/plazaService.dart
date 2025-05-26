@@ -6,7 +6,7 @@ import '../services/globalService.dart';
 
 class PlazaService {
 
-  static const String _baseUrl = 'https://$apiServer/api/Usuarios/IniciarSesion';
+  static const String _baseUrl = 'http://$apiServer/api/Usuarios/IniciarSesion';
   static const String _apikey =
       'heBJ6u4RtETi9xjC5dICVbmh023nX0sIFrQbMHd9FKiyPBP4QyQe0oW1cYoyFFbwvbeoTP7X4hMxyv6RsMKUMEdVkT3lCHhC80mQirqPUUOW95FFnPedtVw4u3Wj53cf';
 
@@ -106,7 +106,7 @@ class PlazaService {
 
     try {
       final response = await http.post(
-        Uri.parse('https://$apiServer/api/Plazas/InsertarPlaza'),
+        Uri.parse('http://$apiServer/api/Plazas/InsertarPlaza'),
         headers: {'Content-Type': 'application/json', 'X-Api-Key': _apikey},
         body: jsonEncode(requestBody),
       );
@@ -140,7 +140,7 @@ class PlazaService {
 
   Future<List<dynamic>> getMunicipios() async{
 
-    final url = Uri.parse('https://$apiServer/api/Generales/ListarMunicipios');
+    final url = Uri.parse('http://$apiServer/api/Generales/ListarMunicipios');
     developer.log('Get Municipios Request URL: $url');
 
     try {
@@ -179,7 +179,7 @@ class PlazaService {
   
   Future<List<dynamic>> getCargos() async{
 
-    final url = Uri.parse('https://$apiServer/api/Cargos/ListarCargos');
+    final url = Uri.parse('http://$apiServer/api/Cargos/ListarCargos');
     developer.log('Get Cargos Request URL: $url');
 
     try {
@@ -214,7 +214,7 @@ class PlazaService {
 
   Future<List<dynamic>> getCategorias() async{
 
-    final url = Uri.parse('https://$apiServer/api/Categorias/ListarCategorias');
+    final url = Uri.parse('http://$apiServer/api/Categorias/ListarCategorias');
     developer.log('Get Categorias Request URL: $url');
 
     try {
@@ -246,7 +246,7 @@ class PlazaService {
 
   Future<List<dynamic>> getTiposContrato() async{
 
-    final url = Uri.parse('https://$apiServer/api/TiposContrato/ListarTiposContrato');
+    final url = Uri.parse('http://$apiServer/api/TiposContrato/ListarTiposContrato');
     developer.log('Get Tipos Contrato Request URL: $url');
 
     try {

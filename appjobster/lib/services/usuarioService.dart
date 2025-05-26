@@ -6,7 +6,7 @@ import '../services/globalService.dart';
 
 class UsuarioService {
   static const String _baseUrl =
-      'https://$apiServer/api/Usuarios/IniciarSesion';
+      'http://jobster.somee.com/api/Usuarios/IniciarSesion';
   static const String _apikey =
       'heBJ6u4RtETi9xjC5dICVbmh023nX0sIFrQbMHd9FKiyPBP4QyQe0oW1cYoyFFbwvbeoTP7X4hMxyv6RsMKUMEdVkT3lCHhC80mQirqPUUOW95FFnPedtVw4u3Wj53cf';
   static const String _baseUrlBuscar =
