@@ -37,7 +37,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   final List<Widget> _pages = [
     const Center(child: Text('Inicio')),
     const Center(child: Text('Búsquedas')),
-    const Center(child: Text('Mensajes')),
+    // const Center(child: Text('Mensajes')),
     const Center(child: Text('Perfil')),
   ];
 
