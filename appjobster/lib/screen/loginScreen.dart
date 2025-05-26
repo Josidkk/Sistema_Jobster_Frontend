@@ -46,6 +46,7 @@ class _LoginScreenState extends State<LoginScreen> {
           setState(() {
             _mensaje = 'Bienvenido';
           });
+
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => const principalScreen()),
@@ -75,6 +76,15 @@ class _LoginScreenState extends State<LoginScreen> {
     const Color accentColor = Color(0xFFFF9A4D); // Naranja más claro
 
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      extendBodyBehindAppBar: true,
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
@@ -275,11 +285,38 @@ class _LoginScreenState extends State<LoginScreen> {
                         Center(
                           child: TextButton(
                             onPressed: () {
-                              Navigator.push(
+                              // Navigator.push(
+                              //   context,
+                              //   MaterialPageRoute(
+                              //     builder: (context) =>
+                              //         const RestablecerContrasenaScreen(),
+                              //   ),
+                              // );
+
+                              Navigator.pushReplacement(
                                 context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      const RestablecerContrasenaScreen(),
+                                PageRouteBuilder(
+                                  pageBuilder:
+                                      (
+                                        context,
+                                        animation,
+                                        secondaryAnimation,
+                                      ) => const RestablecerContrasenaScreen(),
+                                  transitionsBuilder:
+                                      (
+                                        context,
+                                        animation,
+                                        secondaryAnimation,
+                                        child,
+                                      ) {
+                                        return FadeTransition(
+                                          opacity: animation,
+                                          child: child,
+                                        );
+                                      },
+                                  transitionDuration: const Duration(
+                                    milliseconds: 500,
+                                  ),
                                 ),
                               );
                             },
