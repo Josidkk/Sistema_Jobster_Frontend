@@ -71,7 +71,7 @@ class _RestablecerContrasenaScreenState
               MaterialPageRoute(
                 builder: (context) => CodigoScreen(
                   codigoVerificacion: codigoVerificacion,
-                  correo: usuario.usua_Correo!,
+                  id: usuario.usua_Id!,
                 ),
               ),
             );
@@ -108,6 +108,15 @@ class _RestablecerContrasenaScreenState
     const Color accentColor = Color(0xFFFF9A4D); // Naranja más claro
 
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      extendBodyBehindAppBar: true,
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
@@ -234,7 +243,7 @@ class _RestablecerContrasenaScreenState
                                   ),
                                 )
                               : const Text(
-                                  'Ingresa el usuario',
+                                  'Buscar usuario',
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,

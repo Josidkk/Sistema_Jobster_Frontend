@@ -147,10 +147,10 @@ class UsuarioService {
   }
 
   //Restablecer contraseña
-  Future<Usuario?> restablecerContrasena(int id, String contra) async {
+  Future<void> restablecerContrasena(int id, String contra) async {
     final url = Uri.parse(_baseUrlRestablecerContrasena);
+    developer.log('Restablecer contraseña para ID: $id');
 
-    // Using the exact format from the cURL example
     final requestBody = {
       "usua_Id": id,
       "usua_Nombre": "string",
@@ -160,40 +160,34 @@ class UsuarioService {
       "usua_Publicador": true,
       "usua_Imagen": "string",
       "pers_Id": 0,
+      "role_Id": 0,
       "pers_Nombres": "string",
       "pers_Apellidos": "string",
-      "role_Id": 0,
       "role_Descripcion": "string",
-      "usua_Creacion": 0,
-      "usua_FechaCreacion": "2025-05-25T21:57:00.644Z",
-      "usua_Modificacion": 1, //poner la sesion de modificacion
-      "usua_FechaModificacion": "2025-05-25T21:57:00.644Z",
+      "usua_Creacion": 1,
+      "usua_FechaCreacion": "${DateTime.now().toUtc().toIso8601String()}",
+      "usua_Modificacion": 1,
+      "usua_FechaModificacion": "${DateTime.now().toUtc().toIso8601String()}",
       "usua_Estado": true,
     };
 
     try {
-      final response = await http.post(
+      final response = await http.put(
         url,
         headers: {'Content-Type': 'application/json', 'X-Api-Key': _apikey},
         body: jsonEncode(requestBody),
       );
 
-      if (response.statusCode == 200) {
-        final List<dynamic> jsonList = jsonDecode(response.body);
+      developer.log('Respuesta del servidor: ${response.body}');
 
-        if (jsonList.isEmpty) {
-          return null;
-        } else {
-          return Usuario.fromJson(jsonList[0]);
-        }
-      } else {
-        throw Exception(
-          'Error en la solicitud: Código ${response.statusCode}, Respuesta: ${response.body}',
-        );
+      if (response.statusCode != 200) {
+        throw Exception('Error al restablecer la contraseña: ${response.body}');
       }
+
+      final responseData = jsonDecode(response.body);
     } catch (e) {
-      developer.log('Login Error: $e');
-      throw Exception('Error en la solicitud: $e');
+      developer.log('Error al restablecer contraseña: $e');
+      throw Exception('Error de conexión: $e');
     }
   }
 }
