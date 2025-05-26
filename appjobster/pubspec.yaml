@@ -1,4 +1,4 @@
-name: appjobster
+name: jobster
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -40,7 +40,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
+  flutter_launcher_icons: ^0.13.1
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your
@@ -52,6 +52,14 @@ dev_dependencies:
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter packages.
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/logo_HD.png"
+  adaptive_icon_background: "#00FFFFFF" # Fondo transparente
+  adaptive_icon_foreground: "assets/logo_HD.png"
+  remove_alpha_ios: false # Mantener transparencia en iOS
+
 flutter:
 
   # The following line ensures that the Material Icons font is
