@@ -1,17 +1,18 @@
 import 'package:jobster/models/usuarioViewModel.dart';
 import 'package:jobster/services/usuarioService.dart';
 import 'package:flutter/material.dart';
-import '../screen/principalScreen.dart';
-import 'restablecerContrasenaScreen.dart';
+import '../screen/codigoScreen.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class RestablecerContrasenaScreen extends StatefulWidget {
+  const RestablecerContrasenaScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<RestablecerContrasenaScreen> createState() =>
+      _RestablecerContrasenaScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _RestablecerContrasenaScreenState
+    extends State<RestablecerContrasenaScreen> {
   final TextEditingController _usuarioController = TextEditingController();
   final TextEditingController _contrasenaController = TextEditingController();
 
@@ -21,6 +22,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _cargando = false;
   bool _obscureText = true;
   bool _rememberMe = false;
+  String? _codigoVerificacion;
   String _mensaje = '';
 
   @override
@@ -30,7 +32,7 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _iniciarSesion() async {
+  void _restablecerContrasena() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
         _cargando = true;
@@ -38,21 +40,52 @@ class _LoginScreenState extends State<LoginScreen> {
       });
 
       try {
-        final Usuario? usuario = await _usuarioService.login(
+        final Usuario? usuario = await _usuarioService.buscarUsuario(
           _usuarioController.text.trim(),
-          _contrasenaController.text.trim(),
         );
         if (usuario != null) {
           setState(() {
             _mensaje = 'Bienvenido';
           });
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const principalScreen()),
-          );
+
+          if (usuario.usua_Correo?.isEmpty ?? true) {
+            setState(() {
+              _mensaje = 'no se encontro el correo';
+              _cargando = false;
+            });
+            return;
+          }
+
+          try {
+            String codigoVerificacion = await _usuarioService.enviarCorreo(
+              usuario.usua_Correo!,
+            );
+            setState(() {
+              _mensaje = 'Se ha enviado el código al correo';
+              _cargando = false;
+            });
+
+            // El código ya no es null porque viene directo de la API
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => CodigoScreen(
+                  codigoVerificacion: codigoVerificacion,
+                  correo: usuario.usua_Correo!,
+                ),
+              ),
+            );
+          } catch (e) {
+            setState(() {
+              _mensaje = 'Error al enviar el correo: $e';
+              _cargando = false;
+            });
+          }
+
+          // aqui quiero que envie el codigo
         } else {
           setState(() {
-            _mensaje = 'Usuario o contraseña incorrectos';
+            _mensaje = 'Usuario no encontrado';
             _cargando = false;
           });
         }
@@ -116,7 +149,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         const SizedBox(height: 10),
 
                         const Text(
-                          'Iniciar Sesion',
+                          'Restablecer Contraseña',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 32,
@@ -127,7 +160,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         const SizedBox(height: 8),
 
                         const Text(
-                          'Email',
+                          'Usuario',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 14,
@@ -138,9 +171,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
                         TextFormField(
                           controller: _usuarioController,
-                          keyboardType: TextInputType.emailAddress,
+                          keyboardType: TextInputType.name,
                           decoration: InputDecoration(
-                            hintText: 'nombre.usuario@gmail.com',
+                            hintText: 'usuario',
                             fillColor: Colors.white,
                             filled: true,
                             contentPadding: const EdgeInsets.symmetric(
@@ -175,72 +208,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         const SizedBox(height: 16),
 
-                        const Text(
-                          'Password',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-
-                        TextFormField(
-                          controller: _contrasenaController,
-                          obscureText: _obscureText,
-                          decoration: InputDecoration(
-                            hintText: '••••••••••••',
-                            fillColor: Colors.white,
-                            filled: true,
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 14,
-                            ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: BorderSide.none,
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: BorderSide(
-                                color: Colors.grey.shade300,
-                                width: 1,
-                              ),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: const BorderSide(
-                                color: primaryColor,
-                                width: 1,
-                              ),
-                            ),
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _obscureText
-                                    ? Icons.visibility_outlined
-                                    : Icons.visibility_off_outlined,
-                                color: Colors.grey,
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  _obscureText = !_obscureText;
-                                });
-                              },
-                            ),
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Por favor ingrese su contraseña';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 8),
-
                         const SizedBox(height: 24),
 
                         ElevatedButton(
-                          onPressed: _cargando ? null : _iniciarSesion,
+                          onPressed: _cargando ? null : _restablecerContrasena,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: primaryColor,
                             foregroundColor: Colors.white,
@@ -263,7 +234,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                 )
                               : const Text(
-                                  'Iniciar Sesión',
+                                  'Ingresa el usuario',
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
@@ -271,27 +242,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                         ),
                         const SizedBox(height: 16),
-
-                        Center(
-                          child: TextButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      const RestablecerContrasenaScreen(),
-                                ),
-                              );
-                            },
-                            style: TextButton.styleFrom(
-                              foregroundColor: Colors.white,
-                            ),
-                            child: const Text(
-                              '¿Olvidaste tu contraseña?',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ),
 
                         if (_mensaje.isNotEmpty)
                           Padding(
