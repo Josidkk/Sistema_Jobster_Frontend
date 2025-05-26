@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'screen/loginScreen.dart';
 import 'screen/pre-login.dart';
 
 void main() {
@@ -12,8 +13,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false, // Esto elimina la etiqueta de Debug
-      title: 'Jobster',
+      title: 'Flutter Demo',
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -34,7 +34,6 @@ class MyApp extends StatelessWidget {
           seedColor: const Color.fromARGB(255, 255, 77, 18),
         ),
       ),
-      debugShowCheckedModeBanner: false,
       home: const prelogin(),
     );
   }

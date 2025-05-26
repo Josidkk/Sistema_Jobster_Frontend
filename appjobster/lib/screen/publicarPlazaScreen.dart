@@ -1,7 +1,9 @@
 // import 'dart:nativewrappers/_internal/vm/lib/internal_patch.dart';
 
-import 'package:appjobster/models/usuarioViewModel.dart';
-import 'package:appjobster/services/usuarioService.dart';
+// import 'package:appjobster/models/usuarioViewModel.dart';
+// import 'package:appjobster/services/usuarioService.dart';
+import '../models/UsuarioViewModel.dart';
+import '../services/usuarioService.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import '../screen/principalScreen.dart';
@@ -71,44 +73,44 @@ class _PublicarPlazaScreenState extends State<PublicarPlazaScreen> {
 }
 
 
-  void _iniciarSesion() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() {
-        _cargando = true;
-        _mensaje = '';
-      });
+  // void _iniciarSesion() async {
+  //   if (_formKey.currentState!.validate()) {
+  //     setState(() {
+  //       _cargando = true;
+  //       _mensaje = '';
+  //     });
 
-      try {
-        final Usuario? usuario = await _usuarioService.login(
-          _usuarioController.text.trim(),
-          _contrasenaController.text.trim(),
-        );
-        if (usuario != null) {
-          setState(() {
-            _mensaje = 'Bienvenido';
-          });
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const principalScreen()),
-          );
-        } else {
-          setState(() {
-            _mensaje = 'Usuario o contraseña incorrectos';
-            _cargando = false;
-          });
-        }
-      } catch (e) {
-        setState(() {
-          _mensaje = 'ERROR AL INICIAR SESION $e';
-          _cargando = false;
-        });
-      } finally {
-        setState(() {
-          _cargando = false;
-        });
-      }
-    }
-  }
+  //     try {
+  //       final Usuario? usuario = await _usuarioService.login(
+  //         _usuarioController.text.trim(),
+  //         _contrasenaController.text.trim(),
+  //       );
+  //       if (usuario != null) {
+  //         setState(() {
+  //           _mensaje = 'Bienvenido';
+  //         });
+  //         Navigator.pushReplacement(
+  //           context,
+  //           MaterialPageRoute(builder: (context) => const principalScreen()),
+  //         );
+  //       } else {
+  //         setState(() {
+  //           _mensaje = 'Usuario o contraseña incorrectos';
+  //           _cargando = false;
+  //         });
+  //       }
+  //     } catch (e) {
+  //       setState(() {
+  //         _mensaje = 'ERROR AL INICIAR SESION $e';
+  //         _cargando = false;
+  //       });
+  //     } finally {
+  //       setState(() {
+  //         _cargando = false;
+  //       });
+  //     }
+  //   }
+  // }
 
 
     void _publicarPlaza() async {
