@@ -20,7 +20,6 @@ class PublicarPlazaScreen extends StatefulWidget {
 }
 
 class _PublicarPlazaScreenState extends State<PublicarPlazaScreen> {
-
   final _plazaService = PlazaService();
   final TextEditingController _usuarioController = TextEditingController();
   final TextEditingController _contrasenaController = TextEditingController();
@@ -35,9 +34,9 @@ class _PublicarPlazaScreenState extends State<PublicarPlazaScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final UsuarioService _usuarioService = UsuarioService();
 
-  late final cargosList ;
-  late final municipiosList ;
-  late final categoriasList ;
+  late final cargosList;
+  late final municipiosList;
+  late final categoriasList;
   late final tiposContratoList;
 
   bool _cargando = false;
@@ -45,7 +44,7 @@ class _PublicarPlazaScreenState extends State<PublicarPlazaScreen> {
   bool _rememberMe = false;
   String _mensaje = '';
 
-   @override
+  @override
   void initState() {
     super.initState();
     cargosList = _plazaService.getCargos();
@@ -60,18 +59,20 @@ class _PublicarPlazaScreenState extends State<PublicarPlazaScreen> {
     _contrasenaController.dispose();
     super.dispose();
   }
+
   File? _selectedImage;
   Future<void> _pickImage() async {
-  final picker = ImagePicker();
-  final pickedFile = await picker.pickImage(source: ImageSource.gallery); // or ImageSource.camera
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(
+      source: ImageSource.gallery,
+    ); // or ImageSource.camera
 
-  if (pickedFile != null) {
-    setState(() {
-      _selectedImage = File(pickedFile.path);
-    });
+    if (pickedFile != null) {
+      setState(() {
+        _selectedImage = File(pickedFile.path);
+      });
+    }
   }
-}
-
 
   // void _iniciarSesion() async {
   //   if (_formKey.currentState!.validate()) {
@@ -112,8 +113,7 @@ class _PublicarPlazaScreenState extends State<PublicarPlazaScreen> {
   //   }
   // }
 
-
-    void _publicarPlaza() async {
+  void _publicarPlaza() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
         _cargando = true;
@@ -123,13 +123,12 @@ class _PublicarPlazaScreenState extends State<PublicarPlazaScreen> {
       try {
         final respuesta = await _plazaService.crearPlaza(
           _tituloController.text.trim(),
-           _informacionController.text.trim(),
+          _informacionController.text.trim(),
           '_selectedImage',
           _direccionController.text.trim(),
           _selectedCategoriaId,
           _selectedCargoId,
-          _selectedTipoContratoId
-
+          _selectedTipoContratoId,
 
           // _usuarioController.text.trim(),
           // _contrasenaController.text.trim(),
@@ -161,33 +160,28 @@ class _PublicarPlazaScreenState extends State<PublicarPlazaScreen> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     const Color primaryColor = Color(0xFFFF6B00); // Naranja principal
     const Color accentColor = Color(0xFFFF9A4D); // Naranja más claro
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Publicar Plaza',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        backgroundColor: const Color(0xFFFF6B00), // Same as your primaryColor
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
-      ),
+      // appBar: AppBar(
+      //   title: const Text(
+      //     'Publicar Plaza',
+      //     style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      //   ),
+      //   backgroundColor: const Color(0xFFFF6B00), // Same as your primaryColor
+      //   elevation: 0,
+      //   iconTheme: const IconThemeData(color: Colors.white),
+      // ),
       body: Container(
         decoration: const BoxDecoration(
           // image: DecorationImage(
           //   image: AssetImage('assets/JobsterBackground.png'),
           //   fit: BoxFit.cover,
           // ),
-
-          color: Color.fromARGB(255, 255, 134, 42)
+          color: Color.fromARGB(255, 255, 134, 42),
           // color: Color.fromARGB(255, 225, 129, 19)
         ),
         child: SafeArea(
@@ -214,7 +208,6 @@ class _PublicarPlazaScreenState extends State<PublicarPlazaScreen> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-
                         const SizedBox(height: 16),
 
                         const Text(
@@ -252,10 +245,9 @@ class _PublicarPlazaScreenState extends State<PublicarPlazaScreen> {
                         //   ),
                         // ),
                         // const SizedBox(height: 10),
-
                         const SizedBox(height: 16),
 
-                          const Text(
+                        const Text(
                           'Titulo',
                           style: TextStyle(
                             color: Colors.white,
@@ -269,7 +261,8 @@ class _PublicarPlazaScreenState extends State<PublicarPlazaScreen> {
                           controller: _tituloController,
                           // keyboardType: TextInputType.emailAddress,
                           decoration: InputDecoration(
-                            hintText: 'Titulo de La Plaza. ej: Desarrollador Web',
+                            hintText:
+                                'Titulo de La Plaza. ej: Desarrollador Web',
                             fillColor: Colors.white,
                             filled: true,
                             contentPadding: const EdgeInsets.symmetric(
@@ -303,8 +296,6 @@ class _PublicarPlazaScreenState extends State<PublicarPlazaScreen> {
                           },
                         ),
                         const SizedBox(height: 16),
-
-
 
                         const Text(
                           'Informacion Detallada',
@@ -356,8 +347,6 @@ class _PublicarPlazaScreenState extends State<PublicarPlazaScreen> {
                         ////
                         const SizedBox(height: 16),
 
-
-
                         const Text(
                           'Direccion',
                           style: TextStyle(
@@ -370,7 +359,7 @@ class _PublicarPlazaScreenState extends State<PublicarPlazaScreen> {
 
                         TextFormField(
                           controller: _direccionController,
-                          
+
                           decoration: InputDecoration(
                             hintText: 'Avenida X, Calle Y, Local Z',
                             fillColor: Colors.white,
@@ -408,8 +397,6 @@ class _PublicarPlazaScreenState extends State<PublicarPlazaScreen> {
                         ////
                         const SizedBox(height: 16),
 
-
-
                         const Text(
                           'Cargos',
                           style: TextStyle(
@@ -420,46 +407,50 @@ class _PublicarPlazaScreenState extends State<PublicarPlazaScreen> {
                         ),
                         const SizedBox(height: 4),
 
-                          FutureBuilder<List<dynamic>>(
-                            future: cargosList,
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState == ConnectionState.waiting) {
-                                return const CircularProgressIndicator();
-                              } else if (snapshot.hasError) {
-                                return Text('Error: ${snapshot.error}');
-                              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                                return const Text('No hay cargos disponibles');
-                              } else {
-                                final cargos = snapshot.data!;
-                                return DropdownButtonFormField<int>(
-                                  value: _selectedCargoId,
-                                  decoration: InputDecoration(
-                                    labelText: 'Cargo',
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    filled: true,
-                                    fillColor: Colors.white,
+                        FutureBuilder<List<dynamic>>(
+                          future: cargosList,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const CircularProgressIndicator();
+                            } else if (snapshot.hasError) {
+                              return Text('Error: ${snapshot.error}');
+                            } else if (!snapshot.hasData ||
+                                snapshot.data!.isEmpty) {
+                              return const Text('No hay cargos disponibles');
+                            } else {
+                              final cargos = snapshot.data!;
+                              return DropdownButtonFormField<int>(
+                                value: _selectedCargoId,
+                                decoration: InputDecoration(
+                                  labelText: 'Cargo',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
                                   ),
-                                  items: cargos.map<DropdownMenuItem<int>>((cargo) {
-                                    return DropdownMenuItem<int>(
-                                      value: cargo['carg_Id'],
-                                      child: Text(cargo['carg_Descripcion']),
-                                    );
-                                  }).toList(),
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _selectedCargoId = value;
-                                    });
-                                  },
-                                  validator: (value) =>
-                                      value == null ? 'Por favor seleccione un cargo' : null,
-                                );
-                              }
-                            },
-                          ),
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                ),
+                                items: cargos.map<DropdownMenuItem<int>>((
+                                  cargo,
+                                ) {
+                                  return DropdownMenuItem<int>(
+                                    value: cargo['carg_Id'],
+                                    child: Text(cargo['carg_Descripcion']),
+                                  );
+                                }).toList(),
+                                onChanged: (value) {
+                                  setState(() {
+                                    _selectedCargoId = value;
+                                  });
+                                },
+                                validator: (value) => value == null
+                                    ? 'Por favor seleccione un cargo'
+                                    : null,
+                              );
+                            }
+                          },
+                        ),
                         const SizedBox(height: 16),
-
 
                         const Text(
                           'Categoria',
@@ -474,16 +465,21 @@ class _PublicarPlazaScreenState extends State<PublicarPlazaScreen> {
                         FutureBuilder<List<dynamic>>(
                           future: categoriasList,
                           builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.waiting) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
                               return const CircularProgressIndicator();
                             } else if (snapshot.hasError) {
                               return Text('Error: ${snapshot.error}');
-                            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                              return const Text('No hay categorías disponibles');
+                            } else if (!snapshot.hasData ||
+                                snapshot.data!.isEmpty) {
+                              return const Text(
+                                'No hay categorías disponibles',
+                              );
                             } else {
                               final categorias = snapshot.data!;
                               return DropdownButtonFormField<int>(
-                                value: _selectedCategoriaId, // Define this variable in your State
+                                value:
+                                    _selectedCategoriaId, // Define this variable in your State
                                 decoration: InputDecoration(
                                   labelText: 'Categoria',
                                   border: OutlineInputBorder(
@@ -492,7 +488,9 @@ class _PublicarPlazaScreenState extends State<PublicarPlazaScreen> {
                                   filled: true,
                                   fillColor: Colors.white,
                                 ),
-                                items: categorias.map<DropdownMenuItem<int>>((categoria) {
+                                items: categorias.map<DropdownMenuItem<int>>((
+                                  categoria,
+                                ) {
                                   return DropdownMenuItem<int>(
                                     value: categoria['cate_Id'],
                                     child: Text(categoria['cate_Descripcion']),
@@ -503,15 +501,15 @@ class _PublicarPlazaScreenState extends State<PublicarPlazaScreen> {
                                     _selectedCategoriaId = value;
                                   });
                                 },
-                                validator: (value) =>
-                                    value == null ? 'Por favor seleccione una categoría' : null,
+                                validator: (value) => value == null
+                                    ? 'Por favor seleccione una categoría'
+                                    : null,
                               );
                             }
                           },
                         ),
 
                         const SizedBox(height: 16),
-
 
                         const Text(
                           'Tipo de Contrato',
@@ -526,16 +524,21 @@ class _PublicarPlazaScreenState extends State<PublicarPlazaScreen> {
                         FutureBuilder<List<dynamic>>(
                           future: tiposContratoList,
                           builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.waiting) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
                               return const CircularProgressIndicator();
                             } else if (snapshot.hasError) {
                               return Text('Error: ${snapshot.error}');
-                            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                              return const Text('No hay tipos de contrato disponibles');
+                            } else if (!snapshot.hasData ||
+                                snapshot.data!.isEmpty) {
+                              return const Text(
+                                'No hay tipos de contrato disponibles',
+                              );
                             } else {
                               final tiposContrato = snapshot.data!;
                               return DropdownButtonFormField<int>(
-                                value: _selectedTipoContratoId, // Asegúrate de definir esto en tu State
+                                value:
+                                    _selectedTipoContratoId, // Asegúrate de definir esto en tu State
                                 decoration: InputDecoration(
                                   labelText: 'Tipo de Contrato',
                                   border: OutlineInputBorder(
@@ -544,26 +547,27 @@ class _PublicarPlazaScreenState extends State<PublicarPlazaScreen> {
                                   filled: true,
                                   fillColor: Colors.white,
                                 ),
-                                items: tiposContrato.map<DropdownMenuItem<int>>((tipo) {
-                                  return DropdownMenuItem<int>(
-                                    value: tipo['tiCo_Id'],
-                                    child: Text(tipo['tiCo_Descripcion']),
-                                  );
-                                }).toList(),
+                                items: tiposContrato.map<DropdownMenuItem<int>>(
+                                  (tipo) {
+                                    return DropdownMenuItem<int>(
+                                      value: tipo['tiCo_Id'],
+                                      child: Text(tipo['tiCo_Descripcion']),
+                                    );
+                                  },
+                                ).toList(),
                                 onChanged: (value) {
                                   setState(() {
                                     _selectedTipoContratoId = value;
                                   });
                                 },
-                                validator: (value) =>
-                                    value == null ? 'Por favor seleccione un tipo de contrato' : null,
+                                validator: (value) => value == null
+                                    ? 'Por favor seleccione un tipo de contrato'
+                                    : null,
                               );
                             }
                           },
                         ),
                         const SizedBox(height: 16),
-
-
 
                         const SizedBox(height: 24),
 
@@ -597,10 +601,8 @@ class _PublicarPlazaScreenState extends State<PublicarPlazaScreen> {
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                          ),
+                        ),
                         const SizedBox(height: 16),
-
-                        
 
                         if (_mensaje.isNotEmpty)
                           Padding(
@@ -628,4 +630,3 @@ class _PublicarPlazaScreenState extends State<PublicarPlazaScreen> {
     );
   }
 }
-
