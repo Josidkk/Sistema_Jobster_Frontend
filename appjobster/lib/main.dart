@@ -34,6 +34,7 @@ class MyApp extends StatelessWidget {
           seedColor: const Color.fromARGB(255, 255, 77, 18),
         ),
       ),
+      debugShowCheckedModeBanner: false,
       home: const prelogin(),
     );
   }
