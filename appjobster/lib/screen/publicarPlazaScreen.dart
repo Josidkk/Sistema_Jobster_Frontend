@@ -5,9 +5,12 @@
 import '../models/UsuarioViewModel.dart';
 import '../services/usuarioService.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
+
 import '../screen/principalScreen.dart';
 import '../services/plazaService.dart';
+
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -61,6 +64,7 @@ class _PublicarPlazaScreenState extends State<PublicarPlazaScreen> {
   }
 
   File? _selectedImage;
+  
   Future<void> _pickImage() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(
@@ -113,52 +117,136 @@ class _PublicarPlazaScreenState extends State<PublicarPlazaScreen> {
   //   }
   // }
 
-  void _publicarPlaza() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() {
-        _cargando = true;
-        _mensaje = '';
-      });
+  // void _publicarPlaza() async {
+  //   if (_formKey.currentState!.validate()) {
+  //     setState(() {
+  //       _cargando = true;
+  //       _mensaje = '';
+  //     });
 
-      try {
+  //     try {
+  //       // if (_selectedImage == null) {
+  //       //   setState(() {
+  //       //     _mensaje = 'Por favor seleccione una imagen para la plaza';
+  //       //     _cargando = false;
+  //       //   });
+  //       //   return;
+  //       // }
+
+        
+
+        
+        
+
+
+  //       final respuesta = await _plazaService.crearPlaza(
+  //         _tituloController.text.trim(),
+  //         _informacionController.text.trim(),
+  //         '_selectedImage',
+  //         _direccionController.text.trim(),
+  //         _selectedCategoriaId,
+  //         _selectedCargoId,
+  //         _selectedTipoContratoId,
+
+  //         // _usuarioController.text.trim(),
+  //         // _contrasenaController.text.trim(),
+  //       );
+  //       if (respuesta.toString().toLowerCase().contains('creada')) {
+  //         setState(() {
+  //           _mensaje = 'Plaza Publicada con éxito';
+  //         });
+  //         // Navigator.pushReplacement(
+  //         //   context,
+  //         //   MaterialPageRoute(builder: (context) => const principalScreen()),
+  //         // );
+  //       } else {
+  //         setState(() {
+  //           _mensaje = 'Error al publicar la plaza: $respuesta';
+  //           _cargando = false;
+  //         });
+  //       }
+  //     } catch (e) {
+  //       setState(() {
+  //         _mensaje = 'ERROR AL INICIAR SESION $e';
+  //         _cargando = false;
+  //       });
+  //     } finally {
+  //       setState(() {
+  //         _cargando = false;
+  //       });
+  //     }
+  //   }
+  // }
+
+void _publicarPlaza() async {
+  if (_formKey.currentState!.validate()) {
+    setState(() {
+      _cargando = true;
+      _mensaje = '';
+    });
+
+    try {
+      // 1. Check if image is selected
+      if (_selectedImage == null) {
+        setState(() {
+          _mensaje = 'Por favor seleccione una imagen para la plaza';
+          _cargando = false;
+        });
+        return;
+      }
+
+      // 2. Upload image to Cloudinary
+      final url = Uri.parse('https://api.cloudinary.com/v1_1/dw2aj3hcu/image/upload');
+      final request = http.MultipartRequest('POST', url)
+        ..fields['upload_preset'] = 'unsignedig'
+        ..files.add(await http.MultipartFile.fromPath('file', _selectedImage!.path));
+
+      final response = await request.send();
+
+      if (response.statusCode == 200) {
+        final resStr = await response.stream.bytesToString();
+        final resJson = json.decode(resStr);
+        final imageUrl = resJson['secure_url'];
+
+        // 3. Use imageUrl in your plaza creation
         final respuesta = await _plazaService.crearPlaza(
           _tituloController.text.trim(),
           _informacionController.text.trim(),
-          '_selectedImage',
+          imageUrl, // Use the Cloudinary URL here
           _direccionController.text.trim(),
           _selectedCategoriaId,
           _selectedCargoId,
           _selectedTipoContratoId,
-
-          // _usuarioController.text.trim(),
-          // _contrasenaController.text.trim(),
         );
+
         if (respuesta.toString().toLowerCase().contains('creada')) {
           setState(() {
             _mensaje = 'Plaza Publicada con éxito';
           });
-          // Navigator.pushReplacement(
-          //   context,
-          //   MaterialPageRoute(builder: (context) => const principalScreen()),
-          // );
         } else {
           setState(() {
             _mensaje = 'Error al publicar la plaza: $respuesta';
             _cargando = false;
           });
         }
-      } catch (e) {
+      } else {
         setState(() {
-          _mensaje = 'ERROR AL INICIAR SESION $e';
-          _cargando = false;
-        });
-      } finally {
-        setState(() {
+          _mensaje = 'Error al subir la imagen a Cloudinary';
           _cargando = false;
         });
       }
+    } catch (e) {
+      setState(() {
+        _mensaje = 'ERROR AL PUBLICAR PLAZA $e';
+        _cargando = false;
+      });
+    } finally {
+      setState(() {
+        _cargando = false;
+      });
     }
   }
+}
 
   @override
   Widget build(BuildContext context) {
