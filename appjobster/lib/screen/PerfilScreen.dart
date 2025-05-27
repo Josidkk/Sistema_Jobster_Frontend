@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:flutter/material.dart';
 import 'package:jobster/services/Session.dart';
 import 'package:image_picker/image_picker.dart';
@@ -18,6 +20,7 @@ class PerfilScreen extends StatefulWidget {
 }
 
 class _PerfilScreenState extends State<PerfilScreen> {
+  final _personaService = PersonaService();
   Usuario? _usuario;
   Persona? _persona;
   bool _isLoading = true;
@@ -37,9 +40,12 @@ class _PerfilScreenState extends State<PerfilScreen> {
     try {
       final usuario = await UsuarioService().buscarUsuario(Session.usua_Id!);
       if (usuario != null && usuario.pers_Id != null) {
-        final persona = await PersonaService().buscarPersona(usuario.pers_Id!);
+        debugPrint(usuario.pers_Id.toString());
+        final persona = await _personaService.buscarPersona(usuario.pers_Id);
 
         setState(() {
+          developer.log(usuario.toString());
+          print(usuario);
           _usuario = usuario;
           _persona = persona;
           _nombreController.text = _usuario?.usua_Nombre ?? '';
@@ -52,7 +58,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
       }
     } catch (e) {
       setState(() => _isLoading = false);
-      debugPrint('Error al cargar datos: $e');
+      debugPrint('Error al cargar datoss: $e');
     }
   }
 

@@ -525,6 +525,7 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
                               ),
                               const SizedBox(height: 4),
                               ToggleButtons(
+                                
                                 isSelected: [
                                   _persSexo == 'M',
                                   _persSexo == 'F',
@@ -534,15 +535,41 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
                                     _persSexo = index == 0 ? 'M' : 'F';
                                   });
                                 },
+                                
                                 borderRadius: BorderRadius.circular(8),
                                 selectedColor: Colors.white,
                                 // fillColor: Colors.orange.shade400,
                                 fillColor: _persSexo == 'M'? const Color.fromARGB(255, 38, 107, 255) : const Color.fromARGB(255, 255, 38, 161),
                                 color: Colors.black87,
-                                constraints: const BoxConstraints(minHeight: 40, minWidth: 120),
+                                constraints: const BoxConstraints(minHeight: 40, minWidth: 165 ),
                                 children: const [
-                                  Text('Masculino'),
-                                  Text('Femenino'),
+                                  Column(
+                                    children: [
+                                      SizedBox(height: 10),
+                                      Row(
+                                        children: [
+                                          Icon(Icons.man_sharp),
+                                          Text('Masculino')
+                                        ],
+                                      )
+                                      
+                                    ],
+                                  ),
+                                  Column(
+                                    children: [
+                                      SizedBox(height: 10),
+                                      Row(
+                                        children: [
+                                          Icon(Icons.woman_sharp),
+                                          Text('Femenino')                                          
+                                        ],
+                                      )
+                                        
+                                      ],
+                                  ),
+                                
+                                  
+                                  
                                 ],
                               ),
                               if (_persSexo == null && !_cargando)

@@ -1,25 +1,25 @@
 class Persona {
   final int pers_Id;
-  final String pers_DNI;
-  final String pers_Nombres;
-  final String pers_Apellidos;
-  final String pers_Telefono;
-  final String pers_Sexo;
-  final String pers_Direccion;
-  final String pers_Curriculum;
+  final String? pers_DNI;
+  final String? pers_Nombres;
+  final String? pers_Apellidos;
+  final String? pers_Telefono;
+  final String? pers_Sexo;
+  final String? pers_Direccion;
+  final String? pers_Curriculum;
   final int esCi_Id;
-  final String esCi_Descripcion;
-  final String muni_Codigo;
-  final String muni_Descripcion;
-  final String depa_Codigo;
-  final String depa_Descripcion;
+  final String? esCi_Descripcion;
+  final String? muni_Codigo;
+  final String? muni_Descripcion;
+  final String? depa_Codigo;
+  final String? depa_Descripcion;
   final bool pers_Estado;
   final int usua_Creacion;
-  final String usuaC_Nombre;
+  final String? usuaC_Nombre;
   final DateTime pers_FechaCreacion;
-  final int usua_Modificacion;
-  final String usuaM_Nombre;
-  final DateTime pers_FechaModificacion;
+  final int? usua_Modificacion;
+  final String? usuaM_Nombre;
+  final DateTime? pers_FechaModificacion;
 
   Persona({
     required this.pers_Id,
@@ -67,9 +67,7 @@ class Persona {
       "pers_FechaCreacion": pers_FechaCreacion.toUtc().toIso8601String(),
       "usua_Modificacion": usua_Modificacion,
       "usuaM_Nombre": usuaM_Nombre,
-      "pers_FechaModificacion": pers_FechaModificacion
-          .toUtc()
-          .toIso8601String(),
+      "pers_FechaModificacion":  pers_FechaModificacion?.toUtc().toIso8601String(),
     };
   }
 
@@ -95,7 +93,7 @@ class Persona {
       pers_FechaCreacion: DateTime.parse(json['pers_FechaCreacion']),
       usua_Modificacion: json['usua_Modificacion'],
       usuaM_Nombre: json['usuaM_Nombre'],
-      pers_FechaModificacion: DateTime.parse(json['pers_FechaModificacion']),
+      pers_FechaModificacion: json['pers_FechaModificacion'] != null ? DateTime.parse(json['pers_FechaModificacion']) : null  ,
     );
   }
 }

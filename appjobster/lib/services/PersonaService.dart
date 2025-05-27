@@ -11,14 +11,17 @@ class PersonaService {
   static const String _baseUrlEditarPersona =
       'http://jobster.somee.com/api/Personas/Editar';
 
-  Future<Persona?> buscarPersona(int id) async {
+  Future<Persona?> buscarPersona(int? id) async {
+    if (id == null) {
+      return null;
+    }
     final url = Uri.parse('http://jobster.somee.com/api/Personas/Buscar/$id');
     final headers = {
       'accept': '*/*',
       'X-Api-Key':
           'heBJ6u4RtETi9xjC5dICVbmh023nX0sIFrQbMHd9FKiyPBP4QyQe0oW1cYoyFFbwvbeoTP7X4hMxyv6RsMKUMEdVkT3lCHhC80mQirqPUUOW95FFnPedtVw4u3Wj53cf',
     };
-
+    
     final response = await http.get(url, headers: headers);
 
     if (response.statusCode == 200) {
@@ -61,9 +64,7 @@ class PersonaService {
           .toIso8601String(),
       "usua_Modificacion": persona.usua_Modificacion,
       "usuaM_Nombre": persona.usuaM_Nombre,
-      "pers_FechaModificacion": persona.pers_FechaModificacion
-          .toUtc()
-          .toIso8601String(),
+      "pers_FechaModificacion": persona.pers_FechaModificacion?.toUtc().toIso8601String(),
     };
 
     try {
