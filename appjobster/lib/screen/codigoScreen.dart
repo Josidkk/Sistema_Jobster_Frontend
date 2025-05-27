@@ -7,10 +7,10 @@ class CodigoScreen extends StatefulWidget {
   final int id;
 
   const CodigoScreen({
-    Key? key,
+    super.key,
     required this.codigoVerificacion,
     required this.id,
-  }) : super(key: key);
+  });
 
   @override
   State<CodigoScreen> createState() => _CodigoScreenState();
@@ -19,7 +19,7 @@ class CodigoScreen extends StatefulWidget {
 class _CodigoScreenState extends State<CodigoScreen> {
   final TextEditingController _codigoController = TextEditingController();
   String _mensaje = '';
-  bool _cargando = false;
+  final bool _cargando = false;
 
   @override
   void dispose() {
@@ -167,9 +167,9 @@ class NuevaContrasenaScreen extends StatefulWidget {
   final int id;
 
   const NuevaContrasenaScreen({
-    Key? key,
+    super.key,
     required this.id,
-  }) : super(key: key);
+  });
 
   @override
   State<NuevaContrasenaScreen> createState() => _NuevaContrasenaScreenState();
