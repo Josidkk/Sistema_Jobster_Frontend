@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jobster/services/usuarioService.dart';
+import 'package:jobster/services/navigation_service.dart';
 import 'loginScreen.dart';
 
 class CodigoScreen extends StatefulWidget {
@@ -36,9 +37,7 @@ class _CodigoScreenState extends State<CodigoScreen> {
       });
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (context) => NuevaContrasenaScreen(id: widget.id),
-        ),
+        NavigationService.createSlideRoute(NuevaContrasenaScreen(id: widget.id)),
       );
     } else {
       setState(() {
@@ -223,7 +222,7 @@ class _NuevaContrasenaScreenState extends State<NuevaContrasenaScreen> {
       );
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => LoginScreen()),
+        NavigationService.createSlideRoute(const LoginScreen()),
       );
     } catch (e) {
       setState(() {

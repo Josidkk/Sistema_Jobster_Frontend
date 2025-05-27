@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jobster/screen/registroUsuarioScreen.dart';
+import 'package:jobster/services/navigation_service.dart';
 import 'loginScreen.dart';
 
 class prelogin extends StatelessWidget {
@@ -64,12 +65,10 @@ class prelogin extends StatelessWidget {
                     // Botón de Iniciar Sesión
                     ElevatedButton(
                       onPressed: () {
-                        // Navegar a la pantalla de login
-                        Navigator.push(
+                        // Usamos el servicio de navegación
+                        NavigationService.navigateWithSlide(
                           context,
-                          MaterialPageRoute(
-                            builder: (context) => const LoginScreen(),
-                          ),
+                          const LoginScreen(),
                         );
                       },
                       style: ElevatedButton.styleFrom(
@@ -97,14 +96,11 @@ class prelogin extends StatelessWidget {
                     // Botón de Registrarse
                     OutlinedButton(
                       onPressed: () {
-
-                        Navigator.push(
+                        // Usamos el servicio de navegación
+                        NavigationService.navigateWithSlideFade(
                           context,
-                          MaterialPageRoute(
-                            builder: (context) => const RegistroUsuarioScreen(),
-                          ),
+                          const RegistroUsuarioScreen(),
                         );
-                        // Aquí iría la navegación a la pantalla de registro
                       },
                       style: OutlinedButton.styleFrom(
                         foregroundColor: const Color(0xFFFF6B00),

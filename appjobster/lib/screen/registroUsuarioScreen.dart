@@ -3,8 +3,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:jobster/screen/loginScreen.dart';
 import 'dart:io';
 import '../services/plazaService.dart';
+import 'package:jobster/services/navigation_service.dart';
 
 class RegistroUsuarioScreen extends StatefulWidget {
   const RegistroUsuarioScreen({super.key});
@@ -128,6 +130,14 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
 
         if (respuesta.toString().toLowerCase().contains('creada')) {
           setState(() {
+
+               
+
+ NavigationService.navigateWithSlide(
+                          context,
+                          const LoginScreen(),
+                        );
+
             _mensaje = 'Usuario Registrado con éxito';
           });
         } else {
@@ -739,7 +749,7 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
                         ),
                       ),
                       ElevatedButton(
-                          onPressed: _cargando ? null : _registrarUsuario,
+                          onPressed: _cargando ? null : _registrarUsuario ,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: primaryColor,
                             foregroundColor: Colors.white,
