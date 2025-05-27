@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:jobster/services/Session.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'dart:io';
 import '../services/UsuarioService.dart';
 import '../services/PersonaService.dart';
 import '../screen/pre-login.dart';
@@ -19,6 +23,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
   bool _isLoading = true;
   bool _isEditingNombre = false;
   bool _isEditingCorreo = false;
+  bool _isUploadingImage = false;
   final TextEditingController _nombreController = TextEditingController();
   final TextEditingController _correoController = TextEditingController();
 
@@ -48,6 +53,129 @@ class _PerfilScreenState extends State<PerfilScreen> {
     } catch (e) {
       setState(() => _isLoading = false);
       debugPrint('Error al cargar datos: $e');
+    }
+  }
+
+  Future<void> _cambiarImagenPerfil() async {
+    try {
+      // Mostrar dialog para elegir fuente
+      final ImageSource? source = await showDialog<ImageSource>(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Seleccionar imagen'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.photo_library),
+                  title: const Text('Galería'),
+                  onTap: () => Navigator.pop(context, ImageSource.gallery),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.camera_alt),
+                  title: const Text('Cámara'),
+                  onTap: () => Navigator.pop(context, ImageSource.camera),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+
+      if (source == null) return;
+
+      setState(() => _isUploadingImage = true);
+
+      // Seleccionar imagen
+      final picker = ImagePicker();
+      final pickedFile = await picker.pickImage(source: source);
+
+      if (pickedFile != null) {
+        // Subir imagen a Cloudinary
+        final imageUrl = await _subirImagenCloudinary(File(pickedFile.path));
+        
+        if (imageUrl != null) {
+          // Actualizar usuario con nueva imagen
+          await _actualizarImagenUsuario(imageUrl);
+        }
+      }
+    } catch (e) {
+      debugPrint('Error al cambiar imagen: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al cambiar imagen: $e')),
+      );
+    } finally {
+      setState(() => _isUploadingImage = false);
+    }
+  }
+
+  Future<String?> _subirImagenCloudinary(File imageFile) async {
+    try {
+      final url = Uri.parse('https://api.cloudinary.com/v1_1/dw2aj3hcu/image/upload');
+      final request = http.MultipartRequest('POST', url)
+        ..fields['upload_preset'] = 'unsignedig'
+        ..files.add(await http.MultipartFile.fromPath('file', imageFile.path));
+
+      final response = await request.send();
+
+      if (response.statusCode == 200) {
+        final resStr = await response.stream.bytesToString();
+        final resJson = json.decode(resStr);
+        return resJson['secure_url'];
+      } else {
+        debugPrint('Error al subir imagen: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      debugPrint('Error en Cloudinary: $e');
+      return null;
+    }
+  }
+
+  Future<void> _actualizarImagenUsuario(String imageUrl) async {
+    if (_usuario == null) return;
+    
+    try {
+      final usuarioActualizado = Usuario(
+        usua_Id: _usuario!.usua_Id,
+        usua_Nombre: _usuario!.usua_Nombre,
+        usua_Contrasena: _usuario!.usua_Contrasena,
+        usua_Correo: _usuario!.usua_Correo,
+        usua_EsAdmin: _usuario!.usua_EsAdmin,
+        usua_Publicador: _usuario!.usua_Publicador,
+        usua_Imagen: imageUrl, // Nueva imagen
+        pers_Id: _usuario!.pers_Id,
+        role_Id: _usuario!.role_Id,
+        pers_Nombres: _usuario!.pers_Nombres,
+        pers_Apellidos: _usuario!.pers_Apellidos,
+        role_Descripcion: _usuario!.role_Descripcion,
+        usua_Creacion: _usuario!.usua_Creacion,
+        usua_FechaCreacion: _usuario!.usua_FechaCreacion,
+        usua_Modificacion: _usuario!.usua_Modificacion,
+        usua_FechaModificacion: _usuario!.usua_FechaModificacion,
+        usua_Estado: _usuario!.usua_Estado,
+      );
+
+      final success = await UsuarioService().editarUsuario(usuarioActualizado);
+
+      if (success) {
+        setState(() {
+          _usuario = usuarioActualizado;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Imagen de perfil actualizada correctamente')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Error al actualizar la imagen de perfil')),
+        );
+      }
+    } catch (e) {
+      debugPrint('Error al actualizar imagen: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al actualizar imagen: $e')),
+      );
     }
   }
 
@@ -152,10 +280,26 @@ class _PerfilScreenState extends State<PerfilScreen> {
   }
 
   void _cerrarSesion() {
-  Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => prelogin()),
-              );
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => prelogin()),
+    );
+  }
+
+  Widget _buildProfileImage() {
+    if (_usuario?.usua_Imagen != null && _usuario!.usua_Imagen!.isNotEmpty) {
+      return CircleAvatar(
+        radius: 50,
+        backgroundImage: NetworkImage(_usuario!.usua_Imagen!),
+        backgroundColor: Colors.white,
+      );
+    } else {
+      return const CircleAvatar(
+        radius: 50,
+        backgroundImage: AssetImage('assets/Jobster_logo_original.png'),
+        backgroundColor: Colors.white,
+      );
+    }
   }
 
   @override
@@ -186,11 +330,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
                           Stack(
                             alignment: Alignment.center,
                             children: [
-                              const CircleAvatar(
-                                radius: 50,
-                                backgroundImage: AssetImage('assets/Jobster_logo_original.png'),
-                                backgroundColor: Colors.white,
-                              ),
+                              _buildProfileImage(),
                               Positioned(
                                 bottom: 0,
                                 right: 4,
@@ -207,12 +347,17 @@ class _PerfilScreenState extends State<PerfilScreen> {
                                     ],
                                   ),
                                   child: IconButton(
-                                    icon: const Icon(Icons.camera_alt, color: Colors.orange, size: 20),
-                                    onPressed: () {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text('Cambiar imagen de perfil')),
-                                      );
-                                    },
+                                    icon: _isUploadingImage
+                                        ? const SizedBox(
+                                            width: 20,
+                                            height: 20,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              color: Colors.orange,
+                                            ),
+                                          )
+                                        : const Icon(Icons.camera_alt, color: Colors.orange, size: 20),
+                                    onPressed: _isUploadingImage ? null : _cambiarImagenPerfil,
                                     tooltip: 'Cambiar imagen',
                                     padding: const EdgeInsets.all(4),
                                     constraints: const BoxConstraints(),
