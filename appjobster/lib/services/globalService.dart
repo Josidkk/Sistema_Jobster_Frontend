@@ -1,4 +1,4 @@
-library globales;
+library;
 
 // const String apiServer = 'http://jobster.somee.com/api/';
 const String apiServer = 'jobster.somee.com';

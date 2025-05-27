@@ -43,8 +43,8 @@ class _PublicarPlazaScreenState extends State<PublicarPlazaScreen> {
   late final tiposContratoList;
 
   bool _cargando = false;
-  bool _obscureText = true;
-  bool _rememberMe = false;
+  final bool _obscureText = true;
+  final bool _rememberMe = false;
   String _mensaje = '';
 
   @override

@@ -30,7 +30,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  fluttertoast: ^8.2.12
+  toasty_box: ^1.0.1
   http: ^1.4.0
+  another_flushbar: ^1.12.29
+  animations: ^2.0.8
+  
 
   cloudinary_flutter: ^1.0.0
   cloudinary_url_gen: ^1.0.0

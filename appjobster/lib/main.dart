@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'screen/loginScreen.dart';
 import 'screen/pre-login.dart';
-import 'screen/loginScreen.dart';
 import 'screen/publicarPlazaScreen.dart';
+import 'screen/perfilScreen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -39,8 +38,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   final List<Widget> _pages = [
     const Center(child: Text('Inicio')),
     const PublicarPlazaScreen(),
-    // const Center(child: Text('Mensajes')),
-    const Center(child: Text('Perfil')),
+    const PerfilScreen(),
   ];
 
   void _onItemTapped(int index) {

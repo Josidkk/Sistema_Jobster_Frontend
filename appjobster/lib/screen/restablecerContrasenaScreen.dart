@@ -20,8 +20,8 @@ class _RestablecerContrasenaScreenState
   final UsuarioService _usuarioService = UsuarioService();
 
   bool _cargando = false;
-  bool _obscureText = true;
-  bool _rememberMe = false;
+  final bool _obscureText = true;
+  final bool _rememberMe = false;
   String? _codigoVerificacion;
   String _mensaje = '';
 

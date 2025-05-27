@@ -4,6 +4,10 @@ import 'package:flutter/material.dart';
 import '../screen/principalScreen.dart';
 import 'restablecerContrasenaScreen.dart';
 import '../main.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:toasty_box/toasty_box.dart';
+import 'package:another_flushbar/flushbar.dart';
+import 'package:jobster/services/Session.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -13,15 +17,15 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+
   final TextEditingController _usuarioController = TextEditingController();
   final TextEditingController _contrasenaController = TextEditingController();
-
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final UsuarioService _usuarioService = UsuarioService();
 
   bool _cargando = false;
   bool _obscureText = true;
-  bool _rememberMe = false;
+  final bool _rememberMe = false;
   String _mensaje = '';
 
   @override
@@ -44,9 +48,25 @@ class _LoginScreenState extends State<LoginScreen> {
           _contrasenaController.text.trim(),
         );
         if (usuario != null) {
-          setState(() {
-            _mensaje = 'Bienvenido';
-          });
+          // setState(() {
+          //   _mensaje = 'Bienvenido';
+          // });
+
+          await Flushbar(
+            message: 'Bienvenido ${usuario.pers_Nombres ?? ''}',
+            flushbarStyle: FlushbarStyle.FLOATING,
+            icon: const Icon(Icons.check, color: Colors.white),
+            flushbarPosition: FlushbarPosition.TOP,
+            backgroundColor: Colors.green,
+            borderRadius: BorderRadius.circular(8),
+            margin: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(16),
+            duration: const Duration(seconds: 1),
+          ).show(context);
+
+          try {
+            Session.login(usuario.usua_Nombre);
+          } catch (e) {}
 
           Navigator.pushReplacement(
             context,
