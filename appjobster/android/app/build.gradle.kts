@@ -8,7 +8,7 @@ plugins {
 android {
     namespace = "com.example.appjobster"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = "29.0.13113456"
+     // ndkVersion = "27.0.11718014"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11

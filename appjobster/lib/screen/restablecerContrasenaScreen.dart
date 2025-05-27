@@ -2,6 +2,7 @@ import 'package:jobster/models/usuarioViewModel.dart';
 import 'package:jobster/services/usuarioService.dart';
 import 'package:flutter/material.dart';
 import '../screen/codigoScreen.dart';
+import 'package:jobster/services/navigation_service.dart';
 
 class RestablecerContrasenaScreen extends StatefulWidget {
   const RestablecerContrasenaScreen({super.key});
@@ -68,8 +69,8 @@ class _RestablecerContrasenaScreenState
             // El código ya no es null porque viene directo de la API
             Navigator.push(
               context,
-              MaterialPageRoute(
-                builder: (context) => CodigoScreen(
+              NavigationService.createSlideRoute(
+                CodigoScreen(
                   codigoVerificacion: codigoVerificacion,
                   id: usuario.usua_Id!,
                 ),
@@ -113,7 +114,7 @@ class _RestablecerContrasenaScreenState
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Navigator.of(context).pop(),
         ),
       ),
       extendBodyBehindAppBar: true,

@@ -36,8 +36,11 @@ class _PerfilScreenState extends State<PerfilScreen> {
   Future<void> _cargarDatos() async {
     try {
       final usuario = await UsuarioService().buscarUsuario(Session.usua_Id!);
+    
       if (usuario != null && usuario.pers_Id != null) {
+      debugPrint('ñañañaññaña ${usuario.toString()}');
         final persona = await PersonaService().buscarPersona(usuario.pers_Id!);
+    debugPrint('ñeñeññeñeñeññe ${persona.toString()}');
 
         setState(() {
           _usuario = usuario;
