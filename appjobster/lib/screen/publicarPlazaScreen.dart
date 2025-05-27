@@ -698,7 +698,7 @@ void _publicarPlaza() async {
                             child: Text(
                               _mensaje,
                               style: TextStyle(
-                                color: _mensaje.contains('Bienvenido')
+                                color: _mensaje.contains('Bienvenido')||_mensaje.toLowerCase().contains('publicada')
                                     ? Colors.green
                                     : Colors.red,
                                 fontSize: 14,
