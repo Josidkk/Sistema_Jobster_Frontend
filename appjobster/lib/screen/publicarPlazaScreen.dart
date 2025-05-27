@@ -231,7 +231,7 @@ void _publicarPlaza() async {
         }
       } else {
         setState(() {
-          _mensaje = 'Error al subir la imagen a Cloudinary';
+          _mensaje = 'Error al subir la imagen al Servidor';
           _cargando = false;
         });
       }
@@ -309,20 +309,40 @@ void _publicarPlaza() async {
 
                         GestureDetector(
                           onTap: _pickImage,
-                          child: _selectedImage == null
-                              ? Container(
-                                  height: 120,
-                                  width: 120,
-                                  color: Colors.grey[300],
-                                  child: const Icon(Icons.camera_alt, size: 40),
-                                )
-                              : Image.file(
-                                  _selectedImage!,
-                                  height: 120,
-                                  width: 120,
-                                  fit: BoxFit.cover,
-                                ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(16), // Adjust the radius as needed
+                            child: _selectedImage == null
+                                ? Container(
+                                    height: 120,
+                                    width: 120,
+                                    color: Colors.grey[300],
+                                    child: const Icon(Icons.add_photo_alternate_outlined, size: 40),
+                                  )
+                                : Image.file(
+                                    _selectedImage!,
+                                    height: 120,
+                                    width: 120,
+                                    fit: BoxFit.cover,
+                                  ),
+                          ),
                         ),
+
+                        // GestureDetector(
+                        //   onTap: _pickImage,
+                        //   child: _selectedImage == null
+                        //       ? Container(
+                        //           height: 120,
+                        //           width: 120,
+                        //           color: Colors.grey[300],
+                        //           child: const Icon(Icons.insert_photo, size: 40),
+                        //         )
+                        //       : Image.file(
+                        //           _selectedImage!,
+                        //           height: 120,
+                        //           width: 120,
+                        //           fit: BoxFit.cover,
+                        //         ),
+                        // ),
 
                         // const SizedBox(height: 16),
                         // Transform.translate(
