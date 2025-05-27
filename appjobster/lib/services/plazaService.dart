@@ -177,6 +177,47 @@ class PlazaService {
     } 
   // listarmunicipios
   
+
+  Future<List<dynamic>> getEstadosCiviles() async{
+
+    final url = Uri.parse('http://$apiServer/api/Generales/ListarEstadosCiviles');
+    developer.log('Get Municipios Request URL: $url');
+
+    try {
+
+        final response = await http.get(
+          url,
+          headers: {'Content-Type': 'application/json', 'X-Api-Key': _apikey},
+        );
+
+        if (response.statusCode == 200) {
+
+          
+          final Map<String,dynamic > objeto = jsonDecode(response.body);
+          final List<dynamic> estadosCivilesList = objeto['data'] as List<dynamic>;
+
+          print('object');
+          print(estadosCivilesList);
+
+          // final List<dynamic> municipiosList = jsonDecode(response.body);
+          return estadosCivilesList;
+
+        } else {
+          throw Exception(
+            'Error en la solicitud: Código ${response.statusCode}, Respuesta: ${response.body}',
+          );
+        }
+      } catch (e) {
+        developer.log('Get Municipios Error: $e');
+        throw Exception('Error en la solicitud: $e');
+      }
+    } 
+  // listarmunicipios
+
+
+
+
+
   Future<List<dynamic>> getCargos() async{
 
     final url = Uri.parse('http://$apiServer/api/Cargos/ListarCargos');
@@ -277,6 +318,119 @@ class PlazaService {
     
   }
 
+  
+  
+  
+  
+  
+  Future crearPersonaUsuario(String nombre, String contrasena, String correo,
+                     String imagen, String dni, String nombres, String apellidos,
+                     String telefono, String? sexo, String direccion, int? estadocivil,
+                     String? municipio) async {
+
+    final url = Uri.parse(_baseUrl);
+
+    // Using the exact format from the cURL example
+    final requestBody = {
+      "pers_Id": 0,
+      "pers_DNI": dni,
+      "pers_Nombres": nombres,
+      "pers_Apellidos": apellidos,
+      "pers_Telefono": telefono,
+      "pers_Sexo": sexo,
+      "pers_Direccion": direccion,
+      "pers_Curriculum": "sincurriculum",
+      "esCi_Id": estadocivil,
+      "esCi_Descripcion": "string",
+      "muni_Codigo": municipio,
+      "muni_Descripcion": "string",
+      "depa_Codigo": "string",
+      "depa_Descripcion": "string",
+      "pers_Estado": true,
+      "usua_Creacion": 1,
+      "usuaC_Nombre": "string",
+      "pers_FechaCreacion": "2025-05-27T13:51:24.104Z",
+      "usua_Modificacion": 0,
+      "usuaM_Nombre": "string",
+      "pers_FechaModificacion": "2025-05-27T13:51:24.104Z"
+    };
+
+    developer.log('Login Request URL: $url');
+    developer.log(
+      'Login Request Headers: ${{'Content-Type': 'application/json', 'X-Api-Key': _apikey}}',
+    );
+    developer.log('Login Request Body: ${jsonEncode(requestBody)}');
+
+    try {
+      final response = await http.post(
+        Uri.parse('http://$apiServer/api/Personas/Insertar'),
+        headers: {'Content-Type': 'application/json', 'X-Api-Key': _apikey},
+        body: jsonEncode(requestBody),
+      );
+
+      // Log the response for debugging
+      developer.log('Login Response Status: ${response.statusCode}');
+      developer.log('Login Response Body: ${response.body}');
+
+      final requestBodyUsua = {
+         "usua_Id": 0,
+          "usua_Nombre": nombre,
+          "usua_Contrasena": contrasena,
+          "usua_Correo": correo,
+          "usua_EsAdmin": true,
+          "usua_Publicador": true,
+          "usua_Imagen": imagen,
+          "pers_Id": 1,
+          "role_Id": 4,
+          "pers_Nombres": "string",
+          "pers_Apellidos": "string",
+          "role_Descripcion": "string",
+          "usua_Creacion": 1,
+          "usua_FechaCreacion": "2025-05-27T12:12:09.180Z",
+          "usua_Modificacion": 0,
+          "usua_FechaModificacion": "2025-05-27T12:12:09.180Z",
+          "usua_Estado": true
+    };
+
+      if (response.statusCode == 200) {
+        
+        try {
+          final responseUsuario = await http.post(
+            Uri.parse('http://$apiServer/api/Usuarios/Insertar'),
+            headers: {'Content-Type': 'application/json', 'X-Api-Key': _apikey},
+            body: jsonEncode(requestBodyUsua),
+          );
+
+          // Log the response for debugging
+          developer.log('Login Response Status: ${responseUsuario.statusCode}');
+          developer.log('Login Response Body: ${responseUsuario.body}');
+
+          if (responseUsuario.statusCode == 200) {
+
+             return 'creada';
+
+          } else {
+            throw Exception(
+              'Error en la solicitud: Código ${responseUsuario.statusCode}, Respuesta: ${responseUsuario.body}',
+            );
+          }
+        } catch (e) {
+          developer.log('Login Error: $e');
+          throw Exception('Error en la solicitud a crear Usuario: $e');
+        }
+
+        // return 'creada';
+
+      } else {
+        throw Exception(
+          'Error en la solicitud: Código ${response.statusCode}, Respuesta: ${response.body}',
+        );
+      }
+    } catch (e) {
+      developer.log('Login Error: $e');
+      throw Exception('Error en la solicitud a crear Persona: $e');
+    }
+  }
 
 
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jobster/screen/registroUsuarioScreen.dart';
 import 'loginScreen.dart';
 
 class prelogin extends StatelessWidget {
@@ -96,6 +97,13 @@ class prelogin extends StatelessWidget {
                     // Botón de Registrarse
                     OutlinedButton(
                       onPressed: () {
+
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const RegistroUsuarioScreen(),
+                          ),
+                        );
                         // Aquí iría la navegación a la pantalla de registro
                       },
                       style: OutlinedButton.styleFrom(
