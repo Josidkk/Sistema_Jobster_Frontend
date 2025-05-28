@@ -156,7 +156,10 @@ class _CodigoScreenState extends State<CodigoScreen> {
                             )
                           : const Text(
                               'Verificar Código',
-                              style: TextStyle(fontSize: 16),
+                              style: TextStyle(fontSize: 16,
+                              color: Colors.white,),
+                              
+                            
                             ),
                     ),
                   ],

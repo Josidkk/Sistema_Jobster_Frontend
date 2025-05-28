@@ -68,10 +68,10 @@ class _LoginScreenState extends State<LoginScreen> {
             Session.login(usuario.usua_Nombre);
           } catch (e) {}
 
-          Navigator.pushReplacement(
-            context,
-            NavigationService.createSlideRoute(const MainNavigationScreen()),
-          );
+         NavigationService.navigateWithFade(
+                          context,
+                          const MainNavigationScreen(),
+                        );
         } else {
           setState(() {
             _mensaje = 'Usuario o contraseña incorrectos';
@@ -145,7 +145,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         const SizedBox(height: 10),
-
                         const Text(
                           'Iniciar Sesion',
                           style: TextStyle(

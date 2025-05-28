@@ -65,7 +65,7 @@ flutter_launcher_icons:
   ios: true
   image_path: "assets/logo_HD.png"
   adaptive_icon_background: "#FFFF" # Fondo transparente
-  adaptive_icon_foreground: "assets/Jobster_logo_original.png"
+  adaptive_icon_foreground: "assets/logo_HD.png"
   remove_alpha_ios: false # Mantener transparencia en iOS
   icon_size: 35
 

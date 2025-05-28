@@ -97,10 +97,13 @@ class prelogin extends StatelessWidget {
                     OutlinedButton(
                       onPressed: () {
                         // Usamos el servicio de navegación
-                        NavigationService.navigateWithSlideFade(
-                          context,
-                          const RegistroUsuarioScreen(),
-                        );
+
+  NavigationService.navigateWithSlide(
+              context,
+              const RegistroUsuarioScreen(),
+            );
+
+                       
                       },
                       style: OutlinedButton.styleFrom(
                         foregroundColor: const Color(0xFFFF6B00),

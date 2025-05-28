@@ -7,6 +7,8 @@ import 'package:jobster/screen/loginScreen.dart';
 import 'dart:io';
 import '../services/plazaService.dart';
 import 'package:jobster/services/navigation_service.dart';
+import 'package:another_flushbar/flushbar.dart';
+
 
 class RegistroUsuarioScreen extends StatefulWidget {
   const RegistroUsuarioScreen({super.key});
@@ -130,15 +132,26 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
 
         if (respuesta.toString().toLowerCase().contains('creada')) {
           setState(() {
+            _mensaje = 'Usuario registrado con éxito';
+            _cargando = false;
+          });
 
-               
-
- NavigationService.navigateWithSlide(
-                          context,
-                          const LoginScreen(),
-                        );
-
-            _mensaje = 'Usuario Registrado con éxito';
+          Flushbar(
+            message: 'Usuario registrado con éxito',
+            flushbarStyle: FlushbarStyle.FLOATING,
+            icon: const Icon(Icons.check, color: Colors.white),
+            flushbarPosition: FlushbarPosition.TOP,
+            backgroundColor: Colors.green,
+            borderRadius: BorderRadius.circular(8),
+            margin: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(16),
+            duration: const Duration(seconds: 2),
+          ).show(context).then((_) {
+            // Sólo navegar después de que el Flushbar desaparezca
+            NavigationService.navigateWithSlide(
+              context,
+              const LoginScreen(),
+            );
           });
         } else {
           setState(() {
@@ -153,8 +166,6 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
         });
       }
 
-
-        /////////////////////////////////////////
         setState(() {
           _mensaje = 'Usuario registrado con éxito';
         });
@@ -188,15 +199,15 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
     const Color primaryColor = Color(0xFFFF6B00);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Registro de Usuario',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: primaryColor,
+       appBar: AppBar(
+        backgroundColor: Colors.transparent,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
       ),
+      extendBodyBehindAppBar: true,
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(

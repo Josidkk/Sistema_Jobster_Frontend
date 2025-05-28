@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'screen/pre-login.dart';
 import 'screen/publicarPlazaScreen.dart';
 import 'screen/perfilScreen.dart';
+import 'services/navigation_service.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,7 +15,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Jobster',
+      title: '',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color.fromARGB(255, 255, 77, 18),
@@ -51,30 +52,28 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false, // Esto elimina el botón de regreso
         backgroundColor: const Color.fromARGB(255, 255, 106, 0),
         title: Row(
           children: [
-            Image.asset('assets/logo_blanco.png', height: 40),
-            const SizedBox(width: 2), // Espacio entre la imagen y el texto
-            const Text(
-              'Jobster',
-              style: TextStyle(
-                color: Color.fromARGB(255, 87, 87, 87),
-                fontSize: 30,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            Image.asset('assets/Jobster_logo_largo.png', height: 45,width: 140 ,),            
           ],
         ),
-        actions: [
-          IconButton(
+        actions: [          IconButton(
             icon: const Icon(Icons.exit_to_app),
             color: Colors.white,
             onPressed: () {
-              Navigator.pushReplacement(
+             
+              NavigationService.navigateWithFade(
                 context,
-                MaterialPageRoute(builder: (context) => prelogin()),
+                const prelogin(), 
               );
+
+              // Otra opción sería usando pushReplacement para salir completamente
+              // Navigator.pushReplacement(
+              //   context,
+              //   MaterialPageRoute(builder: (context) => prelogin()),
+              // );
             },
           ),
         ],
