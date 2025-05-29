@@ -305,9 +305,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         Center(
                           child: TextButton(
                             onPressed: () {
-                              Navigator.pushReplacement(
+                           
+
+                             NavigationService.navigateWithFade(
                                 context,
-                                NavigationService.createFadeRoute(const RestablecerContrasenaScreen()),
+                                const RestablecerContrasenaScreen(),
                               );
                             },
                             style: TextButton.styleFrom(

@@ -53,7 +53,15 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false, // Esto elimina el botón de regreso
-        backgroundColor: const Color.fromARGB(255, 255, 106, 0),
+        flexibleSpace: Container(
+   decoration: const BoxDecoration(
+    gradient: LinearGradient(
+      colors: [Color(0xFFFF6B00), Color(0xFFEE4D00)],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    ),
+  ),
+),
         title: Row(
           children: [
             Image.asset('assets/Jobster_logo_largo.png', height: 45,width: 140 ,),            
@@ -78,15 +86,21 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           ),
         ],
       ),
-      body: _pages[_selectedIndex],
+      body: AnimatedSwitcher(
+  duration: const Duration(milliseconds: 300),
+  transitionBuilder: (Widget child, Animation<double> animation) {
+    return FadeTransition(opacity: animation, child: child);
+  },
+  child: _pages[_selectedIndex],
+),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: _selectedIndex,
-        selectedItemColor: Theme.of(context).colorScheme.primary,
+        selectedItemColor: const Color.fromARGB(255, 255, 107, 0),
         onTap: _onItemTapped,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Inicio'),
-          BottomNavigationBarItem(icon: Icon(Icons.work), label: 'Plazas'),
+          BottomNavigationBarItem(icon: Icon(Icons.control_point,size: 35,), label: 'Publicar'),
           // BottomNavigationBarItem(icon: Icon(Icons.message), label: 'Mensajes'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
         ],

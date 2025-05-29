@@ -66,7 +66,7 @@ class prelogin extends StatelessWidget {
                     ElevatedButton(
                       onPressed: () {
                         // Usamos el servicio de navegación
-                        NavigationService.navigateWithSlide(
+                        NavigationService.navigateWithFade(
                           context,
                           const LoginScreen(),
                         );
@@ -98,7 +98,7 @@ class prelogin extends StatelessWidget {
                       onPressed: () {
                         // Usamos el servicio de navegación
 
-  NavigationService.navigateWithSlide(
+  NavigationService.navigateWithFade(
               context,
               const RegistroUsuarioScreen(),
             );

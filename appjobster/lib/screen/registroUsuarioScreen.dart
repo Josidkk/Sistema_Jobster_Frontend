@@ -147,7 +147,7 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
             padding: const EdgeInsets.all(16),
             duration: const Duration(seconds: 2),
           ).show(context).then((_) {
-            // Sólo navegar después de que el Flushbar desaparezca
+          
             NavigationService.navigateWithSlide(
               context,
               const LoginScreen(),
@@ -193,10 +193,12 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
     _persDireccionController.dispose();
     super.dispose();
   }
-
+bool Paso2= false;
   @override
   Widget build(BuildContext context) {
     const Color primaryColor = Color(0xFFFF6B00);
+    
+
 
     return Scaffold(
        appBar: AppBar(
@@ -224,16 +226,7 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
                   key: _formKey,
                   child: Column(
                     children: [
-                      const SizedBox(height: 10),
-
-                      Transform.translate(
-                          offset: const Offset(0, 0),
-                          child: Image.asset(
-                            'assets/logo_blanco.png',
-                            height: 100,
-                          ),
-                        ),
-                        
+                      const SizedBox(height: 10),  
 
                         const Text(
                           'Registrate',
@@ -244,8 +237,12 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
                           ),
                           textAlign: TextAlign.left,
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 4),
+                  
+                  
+
                       // Usuario Info Card (rounded)
+                     if(!Paso2)
                       Card(
                         color: const Color.fromARGB(255, 255, 232, 223).withOpacity(0.85), 
                         // color: const Color.fromARGB(255, 255, 221, 206).withOpacity(0.85), 
@@ -384,12 +381,49 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
                                   }
                                   return null;
                                 },
+
                               ),
+
+                              const SizedBox(height: 16),
+                              ElevatedButton(
+                          onPressed: (){ setState(() {
+                            Paso2 = true;
+                          });} ,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: primaryColor,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 100),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            elevation: 0,
+                            disabledBackgroundColor: primaryColor.withOpacity(
+                              0.7,
+                            ),
+                          ),
+                          child: _cargando
+                              ? const SizedBox(
+                                  height: 30,
+                                  width: 30,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : const Text(
+                                  'Siguiente.',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                        ),
                             ],
                           ),
                         ),
                       ),
                       // Persona Info Card (rounded)
+                    if(Paso2)
                       Card(
                         color: const Color.fromARGB(255, 255, 232, 223).withOpacity(0.85), 
                         shape: RoundedRectangleBorder(
@@ -592,6 +626,7 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
                                   
                                   
                                 ],
+                                
                               ),
                               if (_persSexo == null && !_cargando)
                                 const Padding(
@@ -759,6 +794,7 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
                           ),
                         ),
                       ),
+                      if(Paso2)
                       ElevatedButton(
                           onPressed: _cargando ? null : _registrarUsuario ,
                           style: ElevatedButton.styleFrom(
