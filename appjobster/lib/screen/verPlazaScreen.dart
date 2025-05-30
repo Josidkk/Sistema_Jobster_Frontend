@@ -377,6 +377,34 @@ Widget build(BuildContext context) {
                                             },
                                           ),
                                           
+
+                                          FutureBuilder<List<dynamic>>(
+                                            future: tiposContratoList,
+                                            builder: (context, ticoSnapshot) {
+                                              if (ticoSnapshot.connectionState == ConnectionState.waiting) {
+                                                return const SizedBox(
+                                                  height: 20,
+                                                  child: LinearProgressIndicator(),
+                                                );
+                                              } else if (ticoSnapshot.hasError) {
+                                                return _detalleItem(Icons.location_city, 'Municipio', 'Error');
+                                              } else if (!ticoSnapshot.hasData || ticoSnapshot.data!.isEmpty) {
+                                                return _detalleItem(Icons.location_city, 'Municipio', 'No encontrado');
+                                              } else {
+                                                final tipos = ticoSnapshot.data!;
+                                                final int? ticoid = plaza['tiCo_Id'];
+                                                final tipocontrato = tipos.firstWhere(
+                                                  (m) => m['tiCo_Id'] == ticoid,
+                                                  orElse: () => null,
+                                                );
+                                                final String ticoDescripcion = tipocontrato != null
+                                                    ? tipocontrato['tiCo_Descripcion']
+                                                    : 'Municipio no encontrado';
+                                                return _detalleItem(Icons.location_city, 'Tipo de Contrato', ticoDescripcion);
+                                              }
+                                            },
+                                          ),
+                                          
                                           _detalleItem(Icons.assignment, 'Tipo de Contrato', plazaTipoContrato),
                                           _detalleItem(Icons.work, 'Cargo', plazaCargo),
                                           _detalleItem(Icons.category, 'Categoría', plazaCategoria),
