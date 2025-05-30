@@ -1,7 +1,5 @@
-// import 'dart:nativewrappers/_internal/vm/lib/internal_patch.dart';
+import 'package:jobster/services/Session.dart';
 
-// import 'package:appjobster/models/usuarioViewModel.dart';
-// import 'package:appjobster/services/usuarioService.dart';
 import '../models/UsuarioViewModel.dart';
 import '../services/usuarioService.dart';
 import 'package:flutter/material.dart';
@@ -42,11 +40,10 @@ class _VerPlazaScreenState extends State<VerPlazaScreen> {
   late final municipiosList;
   late final categoriasList;
   late final tiposContratoList;
-  late final plazasList ;
-  
+  late final plazasList;
+  late final List listadomunicipios;
 
 
-  File? _selectedImage;
 
   bool _cargando = false;
   final bool _obscureText = true;
@@ -54,14 +51,35 @@ class _VerPlazaScreenState extends State<VerPlazaScreen> {
   String _mensaje = '';
 
 
-  
   void cargarPlazas() async {
-    // final plazaslis = await _plazaService.listarPlazas();
     plazasList = await _plazaService.listarPlazas();
-    
   }
 
   
+    Future<void> llenarMunicipios() async {
+
+    
+    try {
+      final listadomuni = await _plazaService.getMunicipios();
+    
+      if (listadomuni != null) {
+        
+        listadomunicipios = listadomuni;
+
+        
+      } else {
+        
+        debugPrint('listado vacio muni');
+      }
+    } catch (e) {
+      
+      debugPrint('Error al cargar municipioslist: $e');
+    }
+
+
+
+  } 
+
 
   @override
   void initState() {
@@ -70,8 +88,10 @@ class _VerPlazaScreenState extends State<VerPlazaScreen> {
     categoriasList = _plazaService.getCategorias();
     municipiosList = _plazaService.getMunicipios();
     tiposContratoList = _plazaService.getTiposContrato();
+    plazasList = _plazaService.buscarPlaza(Session.plaza_Id!);
+    llenarMunicipios();
+
     
-    plazasList = _plazaService.listarPlazas();
   }
 
   @override
@@ -82,226 +102,340 @@ class _VerPlazaScreenState extends State<VerPlazaScreen> {
   }
 
   
-  
-  Future<void> _pickImage() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(
-      source: ImageSource.gallery,
-    ); // or ImageSource.camera
 
-    if (pickedFile != null) {
-      setState(() {
-        _selectedImage = File(pickedFile.path);
-      });
-    }
+  // Helper widget for details
+  Widget _detalleItem(IconData icon, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: const Color(0xFFEE4D00), size: 22),
+          const SizedBox(width: 10),
+          Expanded(
+            child: RichText(
+              text: TextSpan(
+                style: const TextStyle(fontSize: 16, color: Colors.black87),
+                children: [
+                  TextSpan(
+                    text: '$label: ',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  TextSpan(text: value),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
+@override
+Widget build(BuildContext context) {
+  const Color primaryColor = Color(0xFFFF6B00);
+  const Color accentColor = Color(0xFFFF9A4D);
 
-  @override
-  Widget build(BuildContext context) {
-    const Color primaryColor = Color(0xFFFF6B00); // Naranja principal
-    const Color accentColor = Color(0xFFFF9A4D); // Naranja más claro
-
-    return Scaffold(
-      // appBar: AppBar(
-      //   title: const Text(
-      //     'Publicar Plaza',
-      //     style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-      //   ),
-      //   backgroundColor: const Color(0xFFFF6B00), // Same as your primaryColor
-      //   elevation: 0,
-      //   iconTheme: const IconThemeData(color: Colors.white),
-      // ),
-      body: Container(
-        
-        decoration: const BoxDecoration(
-          // image: DecorationImage(
-          //   image: AssetImage('assets/JobsterBackground.png'),
-          //   fit: BoxFit.cover,
-          // ),
-          color: Colors.white10
-          // color: Color.fromARGB(255, 255, 134, 42),
-          // color: Color.fromARGB(255, 225, 129, 19)
+  return Scaffold(
+    appBar: AppBar(
+      backgroundColor: primaryColor,
+      elevation: 0,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back, color: Colors.white),
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+      ),
+      title: const Text(
+        'Detalle de Plaza',
+        style: TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
         ),
-        child: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              
-              child: Padding(
-                
-                padding: const EdgeInsets.symmetric(horizontal: 0.0),
-                child: Container(
-                  padding: const EdgeInsets.only(
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 20,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.0),
-                    borderRadius: BorderRadius.circular(15),
-                  ),
+      ),
+      centerTitle: true,
+    ),
+    body: Container(
+      decoration: const BoxDecoration(
+        color: Colors.white10,
+      ),
+      child: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 0.0),
+              child: Container(
+                padding: const EdgeInsets.only(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 20,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.0),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      FutureBuilder<List<dynamic>>(
+                        future: plazasList,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return const CircularProgressIndicator();
+                          } else if (snapshot.hasError) {
+                            return Text('Error: ${snapshot.error}');
+                          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                            return const Text('No hay plazas');
+                          } else {
+                            final plazas = snapshot.data!;
+                            final plaza = plazas.first;
 
-                  // constraints: const BoxConstraints(maxWidth: 400),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
+                            final String plazaImagen = plaza['plaz_Imagen'] ?? '';
+                            final String plazaDescripcion = plaza['plaz_Descripcion'] ?? 'Título de la Plaza';
+                            final String plazaInformacion = plaza['plaz_Informacion'] ?? 'Información detallada de la plaza...';
+                            final String plazaRequisitos = plaza['plaz_Requisitos'] ?? 'Requisitos de la plaza...';
+                            final String plazaDireccion = plaza['plaz_Direccion'] ?? 'Dirección';
+                            final String plazaMunicipio = plaza['muni_Descripcion'] ?? 'Municipio';
+                            final String plazaTipoContrato = plaza['tico_Descripcion'] ?? 'Tipo de Contrato';
+                            final String plazaCargo = plaza['carg_Descripcion'] ?? 'Cargo';
+                            final String plazaCategoria = plaza['cate_Descripcion'] ?? 'Categoría';
+                            final String contactoNombre = plaza['contacto_Nombre'] ?? 'Nombre de Contacto';
+                            final String contactoCorreo = plaza['contacto_Correo'] ?? 'Correo de Contacto';
+                            final String contactoTelefono = plaza['contacto_Telefono'] ?? 'Teléfono de Contacto';
 
-                        // Column(
-                        //   children:  plazasList.map( (plaza) => 
-                        //   Card(
+                            final String muniCodigo = plaza['muni_Codigo'] ?? '0000';
 
-                        //     child: Row(
+                            // final muniDescripcion = listadomunicipios.firstWhere((element) => element['muni_Codigo'] == muniCodigo);
 
-                        //       children: [
 
-                        //         Text(plaza.plaz_Descripcion)
-                        //       ],
 
-                        //     ),
+                            
 
-                        //   ),
-                        //   ).toList() 
-                        //   ),
-                        
-                        FutureBuilder<List<dynamic>>(
-                          future: plazasList,
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.waiting) {
-                              return CircularProgressIndicator();
-                            } else if (snapshot.hasError) {
-                              return Text('Error: ${snapshot.error}');
-                            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                              return Text('No hay plazas');
-                            } else {
-                              final plazas = snapshot.data!;
-                              
-                              return Column(
-                                children: plazas.map((plaza) => 
-                                
-                                Row(
-                                  children: [
-                                    SizedBox(
-                                      width: MediaQuery.of(context).size.width,
-                                      height: 300,
-                                      child: Card(
-                                          color: Color(0xFFEE4D00),
-                                          // color: const Color.fromARGB(255, 255, 106, 47).withOpacity(0.85), 
-                                          // color: const Color.fromARGB(255, 255, 221, 206).withOpacity(0.85), 
-                                          shape: BeveledRectangleBorder(
-                                            
-                                            borderRadius: BorderRadius.circular(0),
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  // Imagen principal
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: Image.network(
+                                      plazaImagen,
+                                      height: 220,
+                                      width: double.infinity,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) => Container(
+                                        height: 220,
+                                        color: Colors.grey[300],
+                                        child: const Icon(Icons.broken_image, size: 60, color: Colors.grey),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 18),
+
+                                  // Título y botones
+                                  Row(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          plazaDescripcion,
+                                          style: const TextStyle(
+                                            fontSize: 26,
+                                            fontWeight: FontWeight.bold,
+                                            color: Color(0xFFEE4D00),
                                           ),
-                                          elevation: 0,
-                                          margin: const EdgeInsets.only(bottom: 25, left: 0, right: 0),
-                                          // child: Text(plaza['plaz_Descripcion']),
-                                          child: Column(
-                                            children: [
-                                              const SizedBox(height: 16),
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: ElevatedButton.icon(
+                                          onPressed: () {
+                                            // TODO: Solicitar plaza
+                                          },
+                                          icon: const Icon(Icons.send),
+                                          label: const Text('Solicitar'),
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: primaryColor,
+                                            foregroundColor: Colors.white,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(6),
+                                            ),
+                                            padding: const EdgeInsets.symmetric(vertical: 10),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: OutlinedButton.icon(
+                                          onPressed: () {
+                                            // TODO: Guardar plaza
+                                          },
+                                          icon: const Icon(Icons.bookmark_border),
+                                          label: const Text('Guardar'),
+                                          style: OutlinedButton.styleFrom(
+                                            foregroundColor: primaryColor,
+                                            side: const BorderSide(color: primaryColor),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(6),
+                                            ),
+                                            padding: const EdgeInsets.symmetric(vertical: 10),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 24),
 
-                                              // Row(
-                                              //   children: [
-                                              //     Card(
-                                                    
-                                              //       margin: EdgeInsetsGeometry.only(left: 0, right: 0),
-                                                    
-                                              //       child: Text(plaza['plaz_Descripcion'],
-                                              //               textWidthBasis: TextWidthBasis.parent,
-                                              //               textScaler: TextScaler.linear(1.5),
-                                              //               textAlign: TextAlign.right,
-                                              //               ),
-                                              //     )
-                                              //   ],
-                                              // ),
-                                              
-                                               Center(
-                                                child: Card(
-                                                  
-                                                  color: const Color.fromARGB(255, 202, 202, 202),
-                                                  elevation: 4,
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius: BorderRadius.circular(0),
-                                                  ),
-                                                  margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
-                                                  child: Padding(
-                                                    padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 4),
-                                                    child: SizedBox(
-                                                      width: MediaQuery.of(context).size.width, // or double.infinity for full width inside margin
-                                                      child: Text(
-                                                        plaza['plaz_Descripcion'] ?? '',
-                                                        textAlign: TextAlign.center,
-                                                        style: const TextStyle(
-                                                          fontSize: 20,
-                                                          fontWeight: FontWeight.bold,
-                                                        ),
-                                                        maxLines: 1,
-                                                        overflow: TextOverflow.ellipsis,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
+                                  // Información de la plaza
+                                  const Text(
+                                    'Información',
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    plazaInformacion,
+                                    style: const TextStyle(fontSize: 16, color: Colors.black87),
+                                  ),
+                                  const SizedBox(height: 24),
 
+                                  // Requisitos
+                                  const Text(
+                                    'Requisitos',
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    plazaRequisitos,
+                                    style: const TextStyle(fontSize: 16, color: Colors.black87),
+                                  ),
+                                  const SizedBox(height: 24),
 
-                                              ClipRRect(
-                                                borderRadius: BorderRadius.zero, // squared corners
-                                                child: Image.network(
-                                                  plaza['plaz_Imagen'] ?? '',
-                                                  width: 400,
-                                                  height: 150,
-                                                  fit: BoxFit.cover,
-                                                  errorBuilder: (context, error, stackTrace) => Container(
-                                                    width: 80,
-                                                    height: 80,
-                                                    color: Colors.grey[300],
-                                                    child: const Icon(Icons.broken_image, size: 32),
-                                                  ),
-                                                ),
-                                              )
+                                  // Detalles de la plaza
+                                  const Text(
+                                    'Detalles de la Plaza',
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Card(
+                                    color: const Color(0xFFFFF3E0),
+                                    elevation: 0,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          _detalleItem(Icons.location_on, 'Dirección', plazaDireccion),
 
+                                          FutureBuilder<List<dynamic>>(
+                                            future: municipiosList,
+                                            builder: (context, muniSnapshot) {
+                                              if (muniSnapshot.connectionState == ConnectionState.waiting) {
+                                                return const SizedBox(
+                                                  height: 20,
+                                                  child: LinearProgressIndicator(),
+                                                );
+                                              } else if (muniSnapshot.hasError) {
+                                                return _detalleItem(Icons.location_city, 'Municipio', 'Error');
+                                              } else if (!muniSnapshot.hasData || muniSnapshot.data!.isEmpty) {
+                                                return _detalleItem(Icons.location_city, 'Municipio', 'No encontrado');
+                                              } else {
+                                                final municipios = muniSnapshot.data!;
+                                                final String? municipioCodigo = plaza['muni_Codigo'];
+                                                final municipio = municipios.firstWhere(
+                                                  (m) => m['muni_Codigo'] == municipioCodigo,
+                                                  orElse: () => null,
+                                                );
+                                                final String municipioDescripcion = municipio != null
+                                                    ? municipio['muni_Descripcion']
+                                                    : 'Municipio no encontrado';
+                                                return _detalleItem(Icons.location_city, 'Municipio', municipioDescripcion);
+                                              }
+                                            },
+                                          ),
+                                          
+                                          _detalleItem(Icons.assignment, 'Tipo de Contrato', plazaTipoContrato),
+                                          _detalleItem(Icons.work, 'Cargo', plazaCargo),
+                                          _detalleItem(Icons.category, 'Categoría', plazaCategoria),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 24),
 
-                                              // ElevatedButton(
-                                              //   onPressed: onPressed,
-                                              //   child: child)
-
-                                            ],
-                                          )
-                                    )
-                                  ,
-                                      
-                                    )
-                                  
-                                  ],
-                                )
-                                
-                                ).toList(),
-
-                              );
-                            }
-                          },
-                        ),
-                        const SizedBox(height: 16),
-
-
-                        if (_mensaje.isNotEmpty)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 16),
-                            child: Text(
-                              _mensaje,
-                              style: TextStyle(
-                                color: _mensaje.contains('Bienvenido')||_mensaje.toLowerCase().contains('publicada')
-                                    ? Colors.green
-                                    : Colors.red,
-                                fontSize: 14,
+                                  // Información de contacto
+                                  const Text(
+                                    'Información de Contacto',
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Card(
+                                    color: const Color(0xFFFFF3E0),
+                                    elevation: 0,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          _detalleItem(Icons.person, 'Nombre', contactoNombre),
+                                          _detalleItem(Icons.email, 'Correo', contactoCorreo),
+                                          _detalleItem(Icons.phone, 'Teléfono', contactoTelefono),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 24),
+                                ],
                               ),
-                              textAlign: TextAlign.center,
+                            );
+                          }
+                        },
+                      ),
+                      const SizedBox(height: 16),
+
+                      if (_mensaje.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 16),
+                          child: Text(
+                            _mensaje,
+                            style: TextStyle(
+                              color: _mensaje.contains('Bienvenido') || _mensaje.toLowerCase().contains('publicada')
+                                  ? Colors.green
+                                  : Colors.red,
+                              fontSize: 14,
                             ),
+                            textAlign: TextAlign.center,
                           ),
-                      ],
-                    ),
+                        ),
+                    ],
                   ),
                 ),
               ),
@@ -309,6 +443,10 @@ class _VerPlazaScreenState extends State<VerPlazaScreen> {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
+
+
+
 }

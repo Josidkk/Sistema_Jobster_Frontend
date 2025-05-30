@@ -2,6 +2,9 @@
 
 // import 'package:appjobster/models/usuarioViewModel.dart';
 // import 'package:appjobster/services/usuarioService.dart';
+import 'package:jobster/screen/verPlazaScreen.dart';
+import 'package:jobster/services/Session.dart';
+
 import '../models/UsuarioViewModel.dart';
 import '../services/usuarioService.dart';
 import 'package:flutter/material.dart';
@@ -552,7 +555,13 @@ Row(
                         width: double.infinity,
                         child: ElevatedButton(
                           onPressed: () {
-                            // TODO: Add your navigation logic here
+                            
+                            Session.plaza_Id = plaza['plaz_Id'].toString() ;
+                            Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => VerPlazaScreen()),
+
+                            );
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFFEE4D00),
@@ -563,7 +572,7 @@ Row(
                             padding: const EdgeInsets.symmetric(vertical: 8), // Less height
                           ),
                           child: const Text(
-                            'Ver Mas',
+                            'Más Informacion',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 15,

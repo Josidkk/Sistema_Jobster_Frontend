@@ -468,4 +468,64 @@ class PlazaService {
 
 
   }
+
+  Future<List<dynamic>> buscarPlaza(String plazaid) async {
+
+    final requestBody = {
+
+      
+      "plaz_Id": plazaid,
+      "plaz_Descripcion": "string",
+      "plaz_Informacion": "string",
+      "plaz_Direccion": "string",
+      "plaz_Telefono": "string",
+      "plaz_Correo": "string",
+      "plaz_Imagen": "string",
+      "muni_Codigo": "string",
+      "cate_Id": 0,
+      "usua_Id": 0,
+      "carg_Id": 0,
+      "tiCo_Id": 0,
+      "plaz_Estado": true,
+      "usua_Creacion": 0,
+      "plaz_FechaCreacion": "2025-05-30T18:40:05.381Z",
+      "usua_Modificacion": 0,
+      "plaz_FechaModificacion": "2025-05-30T18:40:05.381Z"
+    
+
+    };
+
+    final url = Uri.parse('http://$apiServer/api/Plazas/BuscarPlaza');
+    developer.log('Get plazas Request URL: $url');
+
+    try {
+
+        final response = await http.post(
+          url,
+          headers: {'Content-Type': 'application/json', 'X-Api-Key': _apikey},
+          body: jsonEncode(requestBody)
+        );
+
+        developer.log('buscar plaza Response Status: ${response.statusCode}');
+        developer.log('buscar plaza Response Body: ${response.body}');
+
+        if (response.statusCode == 200) {
+
+          final List<dynamic> plazaslist = jsonDecode(response.body);
+          return plazaslist;
+
+        } else {
+          throw Exception(
+            'Error en la solicitud: Código ${response.statusCode}, Respuesta: ${response.body}',
+          );
+        }
+      } catch (e) {
+        developer.log('buscar plaza Error: $e');
+        throw Exception('Error al buscar plaza: $e');
+      }
+
+
+  }
+
+  
 }
