@@ -430,139 +430,134 @@ void _publicarPlaza() async {
                                 Row(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: [
-    SizedBox(
-      width: 300,
-      height: 300,
-      child: Card(
-        color: const Color(0xFFFFF3E0),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(18),
-        ),
-        elevation: 6,
-        margin: const EdgeInsets.only(bottom: 25, left: 8, right: 8),
-        child: Row(
-          children: [
-            // Image section
-            ClipRRect(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(18),
-                bottomLeft: Radius.circular(18),
-              ),
-              child: Image.network(
-                plaza['plaz_Imagen'] ?? '',
-                width: 110,
-                height: 300,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Container(
+    Expanded(
+      child: SizedBox(
+        height: 300,
+        child: Card(
+          color: const Color(0xFFFFF3E0),
+          shape: const BeveledRectangleBorder(
+            borderRadius: BorderRadius.zero, // No rounded corners
+          ),
+          elevation: 6,
+          margin: const EdgeInsets.only(bottom: 25, left: 8, right: 8),
+          child: Row(
+            children: [
+              // Image section
+              ClipRRect(
+                borderRadius: BorderRadius.zero, // No rounded corners
+                child: Image.network(
+                  plaza['plaz_Imagen'] ?? '',
                   width: 110,
                   height: 300,
-                  color: Colors.grey[300],
-                  child: const Icon(Icons.broken_image, size: 40, color: Colors.grey),
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    width: 110,
+                    height: 300,
+                    color: Colors.grey[300],
+                    child: const Icon(Icons.broken_image, size: 40, color: Colors.grey),
+                  ),
                 ),
               ),
-            ),
-            // Info section
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    // Title
-                    Text(
-                      plaza['plaz_Descripcion'] ?? 'Sin título',
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFFEE4D00),
-                        letterSpacing: 0.5,
+              // Info section
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      // Title
+                      Text(
+                        plaza['plaz_Descripcion'] ?? 'Sin título',
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFFEE4D00),
+                          letterSpacing: 0.5,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 6),
-                    // Information (large text, max 3 lines)
-                    Text(
-                      plaza['plaz_Informacion'] ?? '',
-                      style: const TextStyle(
-                        fontSize: 15,
-                        color: Colors.black87,
+                      const SizedBox(height: 6),
+                      // Information (large text, max 3 lines)
+                      Text(
+                        plaza['plaz_Informacion'] ?? '',
+                        style: const TextStyle(
+                          fontSize: 15,
+                          color: Colors.black87,
+                        ),
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 10),
-                    // Municipio
-                    Row(
-                      children: [
-                        const Icon(Icons.location_city, color: Colors.grey, size: 18),
-                        const SizedBox(width: 6),
-                        Expanded(
-                          child: Text(
-                            plaza['muni_Descripcion'] ?? 'Municipio',
-                            style: const TextStyle(
-                              fontSize: 15,
-                              color: Colors.black87,
+                      const SizedBox(height: 10),
+                      // Municipio
+                      Row(
+                        children: [
+                          const Icon(Icons.location_city, color: Colors.grey, size: 18),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              plaza['muni_Codigo'] ?? 'Municipio',
+                              style: const TextStyle(
+                                fontSize: 15,
+                                color: Colors.black87,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    // Categoria
-                    Row(
-                      children: [
-                        const Icon(Icons.category, color: Colors.grey, size: 18),
-                        const SizedBox(width: 6),
-                        Expanded(
-                          child: Text(
-                            plaza['cate_Descripcion'] ?? 'Categoría',
-                            style: const TextStyle(
-                              fontSize: 15,
-                              color: Colors.black87,
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      // Categoria
+                      Row(
+                        children: [
+                          const Icon(Icons.category, color: Colors.grey, size: 18),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              plaza['cate_Descripcion'] ?? 'Categoría',
+                              style: const TextStyle(
+                                fontSize: 15,
+                                color: Colors.black87,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    // Cargo
-                    Row(
-                      children: [
-                        const Icon(Icons.work, color: Colors.grey, size: 18),
-                        const SizedBox(width: 6),
-                        Expanded(
-                          child: Text(
-                            plaza['carg_Descripcion'] ?? 'Cargo',
-                            style: const TextStyle(
-                              fontSize: 15,
-                              color: Colors.black87,
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      // Cargo
+                      Row(
+                        children: [
+                          const Icon(Icons.work, color: Colors.grey, size: 18),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              plaza['carg_Descripcion'] ?? 'Cargo',
+                              style: const TextStyle(
+                                fontSize: 15,
+                                color: Colors.black87,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     ),
   ],
 ),
-                                
 
-                                
-                                
                                 ).toList(),
 
                               );
