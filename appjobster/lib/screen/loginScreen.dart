@@ -4,6 +4,11 @@ import 'package:flutter/material.dart';
 import '../screen/principalScreen.dart';
 import 'restablecerContrasenaScreen.dart';
 import '../main.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:toasty_box/toasty_box.dart';
+import 'package:another_flushbar/flushbar.dart';
+import 'package:jobster/services/Session.dart';
+import 'package:jobster/services/navigation_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -15,13 +20,12 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _usuarioController = TextEditingController();
   final TextEditingController _contrasenaController = TextEditingController();
-
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final UsuarioService _usuarioService = UsuarioService();
 
   bool _cargando = false;
   bool _obscureText = true;
-  bool _rememberMe = false;
+  final bool _rememberMe = false;
   String _mensaje = '';
 
   @override
@@ -44,16 +48,31 @@ class _LoginScreenState extends State<LoginScreen> {
           _contrasenaController.text.trim(),
         );
         if (usuario != null) {
-          setState(() {
-            _mensaje = 'Bienvenido';
-          });
+          // setState(() {
+          //   _mensaje = 'Bienvenido';
+          // });
 
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const MainNavigationScreen(),
-            ),
-          );
+          await Flushbar(
+            message: 'Bienvenido ${usuario.pers_Nombres ?? ''}',
+            flushbarStyle: FlushbarStyle.FLOATING,
+            icon: const Icon(Icons.check, color: Colors.white),
+            flushbarPosition: FlushbarPosition.TOP,
+            backgroundColor: Colors.green,
+            borderRadius: BorderRadius.circular(8),
+            margin: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(16),
+            duration: const Duration(seconds: 1),
+          ).show(context);
+
+          try {
+            Session.login(usuario.usua_Nombre);
+            Session.id(usuario.usua_Id);
+          } catch (e) {}
+
+         NavigationService.navigateWithFade(
+                          context,
+                          const MainNavigationScreen(),
+                        );
         } else {
           setState(() {
             _mensaje = 'Usuario o contraseña incorrectos';
@@ -84,7 +103,7 @@ class _LoginScreenState extends State<LoginScreen> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Navigator.of(context).pop(),
         ),
       ),
       extendBodyBehindAppBar: true,
@@ -127,7 +146,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         const SizedBox(height: 10),
-
                         const Text(
                           'Iniciar Sesion',
                           style: TextStyle(
@@ -288,39 +306,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         Center(
                           child: TextButton(
                             onPressed: () {
-                              // Navigator.push(
-                              //   context,
-                              //   MaterialPageRoute(
-                              //     builder: (context) =>
-                              //         const RestablecerContrasenaScreen(),
-                              //   ),
-                              // );
+                           
 
-                              Navigator.pushReplacement(
+                             NavigationService.navigateWithFade(
                                 context,
-                                PageRouteBuilder(
-                                  pageBuilder:
-                                      (
-                                        context,
-                                        animation,
-                                        secondaryAnimation,
-                                      ) => const RestablecerContrasenaScreen(),
-                                  transitionsBuilder:
-                                      (
-                                        context,
-                                        animation,
-                                        secondaryAnimation,
-                                        child,
-                                      ) {
-                                        return FadeTransition(
-                                          opacity: animation,
-                                          child: child,
-                                        );
-                                      },
-                                  transitionDuration: const Duration(
-                                    milliseconds: 500,
-                                  ),
-                                ),
+                                const RestablecerContrasenaScreen(),
                               );
                             },
                             style: TextButton.styleFrom(

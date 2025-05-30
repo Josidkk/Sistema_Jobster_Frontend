@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'screen/pre-login.dart';
-import 'screen/loginScreen.dart';
+import 'screen/publicarPlazaScreen.dart';
+import 'screen/perfilScreen.dart';
+import 'services/navigation_service.dart';
+import 'services/Session.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,7 +16,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Jobster',
+      title: '',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color.fromARGB(255, 255, 77, 18),
@@ -33,36 +36,71 @@ class MainNavigationScreen extends StatefulWidget {
 
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _selectedIndex = 0;
+  bool tieneAccesoPublicar = false;
 
   final List<Widget> _pages = [
     const Center(child: Text('Inicio')),
-    const Center(child: Text('Búsquedas')),
-    // const Center(child: Text('Mensajes')),
-    const Center(child: Text('Perfil')),
+    const PublicarPlazaScreen(),
+    const PerfilScreen(),
   ];
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+  @override
+  void initState() {
+    super.initState();
+    // Verificar acceso al iniciar la pantalla
+    _verificarAcceso();
+  }
+
+  Future<void> _verificarAcceso() async {
+    if (Session.isLoggedIn && Session.usuario_id != null) {
+      await Session.obtenerPantallasDisponibles(Session.usuario_id);
+      setState(() {
+        tieneAccesoPublicar = Session.tieneAccesoAPantalla('Publicar');
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    // Calculamos los elementos disponibles para la barra de navegación
+    final navItems = [
+      const BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Inicio'),
+      if (tieneAccesoPublicar)
+        const BottomNavigationBarItem(
+            icon: Icon(Icons.control_point, size: 35), label: 'Publicar'),
+      const BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
+    ];
+
+    // Aseguramos que el índice seleccionado sea válido
+    if (_selectedIndex >= navItems.length) {
+      _selectedIndex = navItems.length - 1;
+    }
+
+    // Calculamos qué página mostrar basado en los elementos disponibles
+    int pageIndex = _selectedIndex;
+    if (!tieneAccesoPublicar && _selectedIndex >= 1) {
+      // Si no tiene acceso a publicar y el índice es 1 o más, usar índice 2
+      pageIndex = _selectedIndex + 1;
+    }
+
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 255, 106, 0),
+        automaticallyImplyLeading: false, // Esto elimina el botón de regreso
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFFFF6B00), Color(0xFFEE4D00)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
         title: Row(
           children: [
-            Image.asset('assets/logo_blanco.png', height: 40),
-            const SizedBox(width: 2), // Espacio entre la imagen y el texto
-            const Text(
-              'Jobster',
-              style: TextStyle(
-                color: Color.fromARGB(255, 87, 87, 87),
-                fontSize: 30,
-                fontWeight: FontWeight.bold,
-              ),
+            Image.asset(
+              'assets/Jobster_logo_largo.png',
+              height: 45,
+              width: 140,
             ),
           ],
         ),
@@ -71,27 +109,41 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             icon: const Icon(Icons.exit_to_app),
             color: Colors.white,
             onPressed: () {
-              Navigator.pushReplacement(
+              NavigationService.navigateWithFade(
                 context,
-                MaterialPageRoute(builder: (context) => prelogin()),
+                const prelogin(),
               );
+
+              // Otra opción sería usando pushReplacement para salir completamente
+              // Navigator.pushReplacement(
+              //   context,
+              //   MaterialPageRoute(builder: (context) => prelogin()),
+              // );
             },
           ),
         ],
       ),
-      body: _pages[_selectedIndex],
+      body: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 300),
+        transitionBuilder: (Widget child, Animation<double> animation) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+        // Usamos pageIndex para acceder a _pages
+        child: pageIndex < _pages.length ? _pages[pageIndex] : _pages[0],
+      ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: _selectedIndex,
-        selectedItemColor: Theme.of(context).colorScheme.primary,
+        selectedItemColor: const Color.fromARGB(255, 255, 107, 0),
         onTap: _onItemTapped,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Inicio'),
-          BottomNavigationBarItem(icon: Icon(Icons.work), label: 'Plazas'),
-          // BottomNavigationBarItem(icon: Icon(Icons.message), label: 'Mensajes'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
-        ],
+        items: navItems,
       ),
     );
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
   }
 }

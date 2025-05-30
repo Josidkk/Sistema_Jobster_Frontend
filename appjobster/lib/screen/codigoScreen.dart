@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jobster/services/usuarioService.dart';
+import 'package:jobster/services/navigation_service.dart';
 import 'loginScreen.dart';
 
 class CodigoScreen extends StatefulWidget {
@@ -36,9 +37,7 @@ class _CodigoScreenState extends State<CodigoScreen> {
       });
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (context) => NuevaContrasenaScreen(id: widget.id),
-        ),
+        NavigationService.createSlideRoute(NuevaContrasenaScreen(id: widget.id)),
       );
     } else {
       setState(() {
@@ -71,7 +70,10 @@ class _CodigoScreenState extends State<CodigoScreen> {
         child: SafeArea(
           child: Center(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 10000),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24.0,
+                vertical: 20,
+              ),
               child: Container(
                 padding: const EdgeInsets.all(24.0),
                 decoration: BoxDecoration(
@@ -109,7 +111,10 @@ class _CodigoScreenState extends State<CodigoScreen> {
                         hintText: 'Código de 6 dígitos',
                         fillColor: Colors.white,
                         filled: true,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
+                        ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                           borderSide: BorderSide.none,
@@ -122,7 +127,9 @@ class _CodigoScreenState extends State<CodigoScreen> {
                         child: Text(
                           _mensaje,
                           style: TextStyle(
-                            color: _mensaje.contains('incorrecto') ? Colors.red : Colors.green,
+                            color: _mensaje.contains('incorrecto')
+                                ? Colors.red
+                                : Colors.green,
                             fontSize: 14,
                           ),
                           textAlign: TextAlign.center,
@@ -149,7 +156,10 @@ class _CodigoScreenState extends State<CodigoScreen> {
                             )
                           : const Text(
                               'Verificar Código',
-                              style: TextStyle(fontSize: 16),
+                              style: TextStyle(fontSize: 16,
+                              color: Colors.white,),
+                              
+                            
                             ),
                     ),
                   ],
@@ -166,10 +176,7 @@ class _CodigoScreenState extends State<CodigoScreen> {
 class NuevaContrasenaScreen extends StatefulWidget {
   final int id;
 
-  const NuevaContrasenaScreen({
-    Key? key,
-    required this.id,
-  }) : super(key: key);
+  const NuevaContrasenaScreen({Key? key, required this.id}) : super(key: key);
 
   @override
   State<NuevaContrasenaScreen> createState() => _NuevaContrasenaScreenState();
@@ -178,7 +185,8 @@ class NuevaContrasenaScreen extends StatefulWidget {
 class _NuevaContrasenaScreenState extends State<NuevaContrasenaScreen> {
   final _usuarioService = UsuarioService();
   final TextEditingController _contrasenaController = TextEditingController();
-  final TextEditingController _confirmarContrasenaController = TextEditingController();
+  final TextEditingController _confirmarContrasenaController =
+      TextEditingController();
   String _mensaje = '';
   bool _cargando = false;
   bool _obscureText = true;
@@ -211,10 +219,13 @@ class _NuevaContrasenaScreenState extends State<NuevaContrasenaScreen> {
     });
 
     try {
-      await _usuarioService.restablecerContrasena(widget.id, _contrasenaController.text);
+      await _usuarioService.restablecerContrasena(
+        widget.id,
+        _contrasenaController.text,
+      );
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => LoginScreen()),
+        NavigationService.createSlideRoute(const LoginScreen()),
       );
     } catch (e) {
       setState(() {
@@ -248,7 +259,10 @@ class _NuevaContrasenaScreenState extends State<NuevaContrasenaScreen> {
         child: SafeArea(
           child: Center(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24.0,
+                vertical: 40,
+              ),
               child: Container(
                 padding: const EdgeInsets.all(24.0),
                 decoration: BoxDecoration(
@@ -284,14 +298,19 @@ class _NuevaContrasenaScreenState extends State<NuevaContrasenaScreen> {
                         hintText: '••••••••••••',
                         fillColor: Colors.white,
                         filled: true,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
+                        ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                           borderSide: BorderSide.none,
                         ),
                         suffixIcon: IconButton(
                           icon: Icon(
-                            _obscureText ? Icons.visibility_off : Icons.visibility,
+                            _obscureText
+                                ? Icons.visibility_off
+                                : Icons.visibility,
                             color: Colors.grey,
                           ),
                           onPressed: () {
@@ -319,7 +338,10 @@ class _NuevaContrasenaScreenState extends State<NuevaContrasenaScreen> {
                         hintText: '••••••••••••',
                         fillColor: Colors.white,
                         filled: true,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
+                        ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                           borderSide: BorderSide.none,
@@ -332,7 +354,9 @@ class _NuevaContrasenaScreenState extends State<NuevaContrasenaScreen> {
                         child: Text(
                           _mensaje,
                           style: TextStyle(
-                            color: _mensaje.contains('Error') ? Colors.red : Colors.green,
+                            color: _mensaje.contains('Error')
+                                ? Colors.red
+                                : Colors.green,
                             fontSize: 14,
                           ),
                           textAlign: TextAlign.center,
