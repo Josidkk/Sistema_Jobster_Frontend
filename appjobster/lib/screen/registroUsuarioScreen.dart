@@ -7,8 +7,6 @@ import 'package:jobster/screen/loginScreen.dart';
 import 'dart:io';
 import '../services/plazaService.dart';
 import 'package:jobster/services/navigation_service.dart';
-import 'package:another_flushbar/flushbar.dart';
-
 
 class RegistroUsuarioScreen extends StatefulWidget {
   const RegistroUsuarioScreen({super.key});
@@ -17,9 +15,7 @@ class RegistroUsuarioScreen extends StatefulWidget {
   State<RegistroUsuarioScreen> createState() => _RegistroUsuarioScreenState();
 }
 
-
 class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
-
   final _plazaService = PlazaService();
   // Controllers for usuario info
   final TextEditingController _usuaNombreController = TextEditingController();
@@ -48,6 +44,9 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _cargando = false;
   String _mensaje = '';
+  
+  // Stepper control
+  int _currentStep = 0;
 
   @override
   void initState() {
@@ -66,14 +65,6 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
     ];
   }
 
-  // Future<List<dynamic>> getMunicipios() async {
-  //   return [
-  //     {'muni_Codigo': '0501', 'muni_Descripcion': 'Municipio 1'},
-  //     {'muni_Codigo': '0501', 'muni_Descripcion': 'Municipio 2'},
-  //     {'muni_Codigo': '0501', 'muni_Descripcion': 'Municipio 3'},
-  //   ];
-  // }
-
   Future<void> _pickUsuaImage() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -85,31 +76,29 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
   }
 
   void _registrarUsuario() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() {
-        _cargando = true;
-        _mensaje = '';
-      });
+    setState(() {
+      _cargando = true;
+      _mensaje = '';
+    });
 
-      try {
+    try {
+      if (_selectedUsuaImagen == null) {
+        setState(() {
+          _mensaje = 'Por favor seleccione una imagen para la plaza';
+          _cargando = false;
+        });
+        return;
+      }
 
-          if (_selectedUsuaImagen == null) {
-          setState(() {
-            _mensaje = 'Por favor seleccione una imagen para la plaza';
-            _cargando = false;
-          });
-          return;
-        }
+      // 2. Upload image to Cloudinary
+      final url = Uri.parse('https://api.cloudinary.com/v1_1/dw2aj3hcu/image/upload');
+      final request = http.MultipartRequest('POST', url)
+        ..fields['upload_preset'] = 'unsignedig'
+        ..files.add(await http.MultipartFile.fromPath('file', _selectedUsuaImagen!.path));
 
-        // 2. Upload image to Cloudinary
-        final url = Uri.parse('https://api.cloudinary.com/v1_1/dw2aj3hcu/image/upload');
-        final request = http.MultipartRequest('POST', url)
-          ..fields['upload_preset'] = 'unsignedig'
-          ..files.add(await http.MultipartFile.fromPath('file', _selectedUsuaImagen!.path));
+      final response = await request.send();
 
-        final response = await request.send();
-
-        if (response.statusCode == 200) {
+      if (response.statusCode == 200) {
         final resStr = await response.stream.bytesToString();
         final resJson = json.decode(resStr);
         final imageUrl = resJson['secure_url'];
@@ -132,26 +121,12 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
 
         if (respuesta.toString().toLowerCase().contains('creada')) {
           setState(() {
-            _mensaje = 'Usuario registrado con éxito';
-            _cargando = false;
-          });
-
-          Flushbar(
-            message: 'Usuario registrado con éxito',
-            flushbarStyle: FlushbarStyle.FLOATING,
-            icon: const Icon(Icons.check, color: Colors.white),
-            flushbarPosition: FlushbarPosition.TOP,
-            backgroundColor: Colors.green,
-            borderRadius: BorderRadius.circular(8),
-            margin: const EdgeInsets.all(8),
-            padding: const EdgeInsets.all(16),
-            duration: const Duration(seconds: 2),
-          ).show(context).then((_) {
-          
             NavigationService.navigateWithSlide(
               context,
               const LoginScreen(),
             );
+
+            _mensaje = 'Usuario Registrado con éxito';
           });
         } else {
           setState(() {
@@ -166,18 +141,17 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
         });
       }
 
-        setState(() {
-          _mensaje = 'Usuario registrado con éxito';
-        });
-      } catch (e) {
-        setState(() {
-          _mensaje = 'Error al registrar usuario: $e';
-        });
-      } finally {
-        setState(() {
-          _cargando = false;
-        });
-      }
+      setState(() {
+        _mensaje = 'Usuario registrado con éxito';
+      });
+    } catch (e) {
+      setState(() {
+        _mensaje = 'Error al registrar usuario: $e';
+      });
+    } finally {
+      setState(() {
+        _cargando = false;
+      });
     }
   }
 
@@ -193,23 +167,40 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
     _persDireccionController.dispose();
     super.dispose();
   }
-bool Paso2= false;
+
+  // Método para continuar al siguiente paso
+  void _nextStep() {
+    if (_currentStep < 2) {
+      setState(() {
+        _currentStep += 1;
+      });
+    } else {
+      _registrarUsuario();
+    }
+  }
+
+  // Método para volver al paso anterior
+  void _previousStep() {
+    if (_currentStep > 0) {
+      setState(() {
+        _currentStep -= 1;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     const Color primaryColor = Color(0xFFFF6B00);
-    
-
 
     return Scaffold(
-       appBar: AppBar(
+     appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.of(context).pop(),
         ),
-      ),
-      extendBodyBehindAppBar: true,
+      ),extendBodyBehindAppBar: true,
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
@@ -218,668 +209,569 @@ bool Paso2= false;
           ),
         ),
         child: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 0.0),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 10),  
-
-                        const Text(
-                          'Registrate',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          textAlign: TextAlign.left,
-                        ),
-                        const SizedBox(height: 4),
-                  
-                  
-
-                      // Usuario Info Card (rounded)
-                     if(!Paso2)
-                      Card(
-                        color: const Color.fromARGB(255, 255, 232, 223).withOpacity(0.85), 
-                        // color: const Color.fromARGB(255, 255, 221, 206).withOpacity(0.85), 
+          child: Column(
+            children: [
+              const SizedBox(height: 5),
+            
+              const Text(
+                'Registrate',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.left,
+              ),
+              const SizedBox(height: 12),
+              
+              // Stepper indicator
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Row(
+                  children: [
+                    _buildStepperDot(0, 'Cuenta'),
+                    _buildStepperLine(),
+                    _buildStepperDot(1, 'Personal'),
+                    _buildStepperLine(),
+                    _buildStepperDot(2, 'Contacto'),
+                  ],
+                ),
+              ),
+              
+              const SizedBox(height: 16),
+              
+              // Content based on current step
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Form(
+                      key: _formKey,
+                      child: Card(
+                        color: const Color.fromARGB(255, 255, 232, 223).withOpacity(0.85),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
                         ),
                         elevation: 4,
-                        margin: const EdgeInsets.only(bottom: 24, left: 16, right: 16),
                         child: Padding(
                           padding: const EdgeInsets.all(20.0),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              const Text(
-                                textAlign: TextAlign.center,
-                                'Datos del Usuario',
-                                style: TextStyle(
-                                  color: primaryColor,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  
-                                ),
-                              ),
-                              const SizedBox(height: 16),
-                              const Text(
-                                'Foto de Perfil',
-                                style: TextStyle(
-                                  color: Colors.black87,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              GestureDetector(
-                                onTap: _pickUsuaImage,
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(16),
-                                  child: _selectedUsuaImagen == null
-                                      ? Container(
-                                          height: 120,
-                                          width: 120,
-                                          color: Colors.white,
-                                          child: const Icon(Icons.add_photo_alternate_outlined, size: 40),
-                                        )
-                                      : Image.file(
-                                          _selectedUsuaImagen!,
-                                          height: 120,
-                                          width: 120,
-                                          fit: BoxFit.cover,
-                                        ),
-                                ),
-                              ),
-                              const SizedBox(height: 16),
-                              const Text(
-                                'Nombre de Usuario',
-                                style: TextStyle(
-                                  color: Colors.black87,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              TextFormField(
-                                controller: _usuaNombreController,
-                                decoration: InputDecoration(
-                                  hintText: 'Ingrese el nombre de usuario',
-                                  fillColor: Colors.white,
-                                  filled: true,
-                                  border: UnderlineInputBorder(
-                                    
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Ingrese el nombre de usuario';
-                                  }
-                                  return null;
-                                },
-                              ),
-                              const SizedBox(height: 16),
-                              const Text(
-                                'Contraseña',
-                                style: TextStyle(
-                                  color: Colors.black87,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              TextFormField(
-                                controller: _usuaContrasenaController,
-                                obscureText: true,
-                                decoration: InputDecoration(
-                                  hintText: 'Ingrese la contraseña',
-                                  fillColor: Colors.white,
-                                  filled: true,
-                                  border: UnderlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Ingrese la contraseña';
-                                  }
-                                  return null;
-                                },
-                              ),
-                              const SizedBox(height: 16),
-                              const Text(
-                                'Correo Electrónico',
-                                style: TextStyle(
-                                  color: Colors.black87,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              TextFormField(
-                                controller: _correoController,
-                                keyboardType: TextInputType.emailAddress,
-                                decoration: InputDecoration(
-                                  hintText: 'Ingrese el correo electrónico',
-                                  fillColor: Colors.white,
-                                  filled: true,
-                                  border: UnderlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Ingrese el correo electrónico';
-                                  }
-                                  if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                                    return 'Ingrese un correo válido';
-                                  }
-                                  return null;
-                                },
-
-                              ),
-
-                              const SizedBox(height: 16),
-                              ElevatedButton(
-                          onPressed: (){ setState(() {
-                            Paso2 = true;
-                          });} ,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: primaryColor,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 100),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            elevation: 0,
-                            disabledBackgroundColor: primaryColor.withOpacity(
-                              0.7,
-                            ),
-                          ),
-                          child: _cargando
-                              ? const SizedBox(
-                                  height: 30,
-                                  width: 30,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: Colors.white,
-                                  ),
-                                )
-                              : const Text(
-                                  'Siguiente.',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                        ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      // Persona Info Card (rounded)
-                    if(Paso2)
-                      Card(
-                        color: const Color.fromARGB(255, 255, 232, 223).withOpacity(0.85), 
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        elevation: 4,
-                        margin: const EdgeInsets.only(bottom: 24, left: 16, right: 16),
-                        child: Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              const Text(
-                                textAlign: TextAlign.center,
-                                'Datos Personales',
-                                style: TextStyle(
-                                  color: primaryColor,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 16),
-                              const Text(
-                                'DNI',
-                                style: TextStyle(
-                                  color: Colors.black87,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              TextFormField(
-                                controller: _persDNIController,
-                                decoration: InputDecoration(
-                                  hintText: 'Ingrese el DNI',
-                                  fillColor: Colors.white,
-                                  filled: true,
-                                  border: UnderlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Ingrese el DNI';
-                                  }
-                                  return null;
-                                },
-                              ),
-                              const SizedBox(height: 16),
-                              const Text(
-                                'Nombres',
-                                style: TextStyle(
-                                  color: Colors.black87,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              TextFormField(
-                                controller: _persNombresController,
-                                decoration: InputDecoration(
-                                  hintText: 'Ingrese los nombres',
-                                  fillColor: Colors.white,
-                                  filled: true,
-                                  border: UnderlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Ingrese los nombres';
-                                  }
-                                  return null;
-                                },
-                              ),
-                              const SizedBox(height: 16),
-                              const Text(
-                                'Apellidos',
-                                style: TextStyle(
-                                  color: Colors.black87,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              TextFormField(
-                                controller: _persApellidosController,
-                                decoration: InputDecoration(
-                                  hintText: 'Ingrese los apellidos',
-                                  fillColor: Colors.white,
-                                  filled: true,
-                                  border: UnderlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Ingrese los apellidos';
-                                  }
-                                  return null;
-                                },
-                              ),
-
-                              //inicio sexos
-                              const SizedBox(height: 16),
-
-                              // const Text(
-                              //   'Sexo',
-                              //   style: TextStyle(
-                              //     color: Colors.black87,
-                              //     fontSize: 14,
-                              //     fontWeight: FontWeight.bold,
-                              //   ),
-                              // ),
-                              // const SizedBox(height: 4),
-                              // DropdownButtonFormField<String>(
-                              //   value: _persSexo,
-                              //   decoration: InputDecoration(
-                              //     labelText: 'Seleccione el sexo',
-                              //     border: UnderlineInputBorder(
-                              //       borderRadius: BorderRadius.circular(8),
-                              //     ),
-                              //     filled: true,
-                              //     fillColor: Colors.white,
-                              //   ),
-                              //   items: const [
-                              //     DropdownMenuItem(
-                              //       value: 'M',
-                              //       child: Text('Masculino'),
-                              //     ),
-                              //     DropdownMenuItem(
-                              //       value: 'F',
-                              //       child: Text('Femenino'),
-                              //     ),
-                              //   ],
-                              //   onChanged: (value) {
-                              //     setState(() {
-                              //       _persSexo = value;
-                              //     });
-                              //   },
-                              //   validator: (value) =>
-                              //       value == null ? 'Seleccione el sexo' : null,
-                              // ),
+                              // Mostrar contenido según el paso actual
+                              if (_currentStep == 0)
+                                _buildStep1Content(),
+                              if (_currentStep == 1)
+                                _buildStep2Content(),
+                              if (_currentStep == 2)
+                                _buildStep3Content(),
+                                
+                              const SizedBox(height: 20),
                               
+                              // Navigation buttons
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  if (_currentStep > 0)
+                                    ElevatedButton(
+                                      onPressed: _previousStep,
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.grey,
+                                        foregroundColor: Colors.white,
+                                      ),
+                                      child: const Text('Anterior'),
+                                    )
+                                  else
+                                    const SizedBox(),
+                                  
+                                  ElevatedButton(
+                                    onPressed: _cargando ? null : _nextStep,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: primaryColor,
+                                      foregroundColor: Colors.white,
+                                    ),
+                                    child: _cargando
+                                        ? const SizedBox(
+                                            height: 20,
+                                            width: 20,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              color: Colors.white,
+                                            ),
+                                          )
+                                        : Text(_currentStep == 2 ? 'Registrarse' : 'Siguiente'),
+                                  ),
+                                ],
+                              ),
                               
-                              // ...existing code...
-                              const Text(
-                                'Sexo',
-                                style: TextStyle(
-                                  color: Colors.black87,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              ToggleButtons(
-                                
-                                isSelected: [
-                                  _persSexo == 'M',
-                                  _persSexo == 'F',
-                                ],
-                                onPressed: (index) {
-                                  setState(() {
-                                    _persSexo = index == 0 ? 'M' : 'F';
-                                  });
-                                },
-                                
-                                borderRadius: BorderRadius.circular(8),
-                                selectedColor: Colors.white,
-                                // fillColor: Colors.orange.shade400,
-                                fillColor: _persSexo == 'M'? const Color.fromARGB(255, 38, 107, 255) : const Color.fromARGB(255, 255, 38, 161),
-                                color: Colors.black87,
-                                constraints: const BoxConstraints(minHeight: 40, minWidth: 165 ),
-                                children: const [
-                                  Column(
-                                    children: [
-                                      SizedBox(height: 10),
-                                      Row(
-                                        children: [
-                                          Icon(Icons.man_sharp),
-                                          Text('Masculino')
-                                        ],
-                                      )
-                                      
-                                    ],
-                                  ),
-                                  Column(
-                                    children: [
-                                      SizedBox(height: 10),
-                                      Row(
-                                        children: [
-                                          Icon(Icons.woman_sharp),
-                                          Text('Femenino')                                          
-                                        ],
-                                      )
-                                        
-                                      ],
-                                  ),
-                                
-                                  
-                                  
-                                ],
-                                
-                              ),
-                              if (_persSexo == null && !_cargando)
-                                const Padding(
-                                  padding: EdgeInsets.only(left: 8.0, top: 2),
+                              if (_mensaje.isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 16),
                                   child: Text(
-                                    'Seleccione el sexo',
-                                    style: TextStyle(color: Colors.red, fontSize: 12),
+                                    _mensaje,
+                                    style: TextStyle(
+                                      color: _mensaje.contains('éxito')
+                                          ? Colors.green
+                                          : Colors.red,
+                                      fontSize: 14,
+                                    ),
+                                    textAlign: TextAlign.center,
                                   ),
                                 ),
-                              
-                              
-                              //fin perssexos
-                              const SizedBox(height: 16),
-                              const Text(
-                                'Teléfono',
-                                style: TextStyle(
-                                  color: Colors.black87,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              TextFormField(
-                                controller: _persTelefonoController,
-                                keyboardType: TextInputType.phone,
-                                decoration: InputDecoration(
-                                  hintText: 'Ingrese el teléfono',
-                                  fillColor: Colors.white,
-                                  filled: true,
-                                  border: UnderlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Ingrese el teléfono';
-                                  }
-                                  return null;
-                                },
-                              ),
-                              const SizedBox(height: 16),
-                              const Text(
-                                'Dirección',
-                                style: TextStyle(
-                                  color: Colors.black87,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              TextFormField(
-                                controller: _persDireccionController,
-                                decoration: InputDecoration(
-                                  hintText: 'Ingrese la dirección',
-                                  fillColor: Colors.white,
-                                  filled: true,
-                                  border: UnderlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Ingrese la dirección';
-                                  }
-                                  return null;
-                                },
-                              ),
-                              const SizedBox(height: 16),
-                              const Text(
-                                'Estado Civil',
-                                style: TextStyle(
-                                  color: Colors.black87,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              FutureBuilder<List<dynamic>>(
-                                future: estadosCivilesList,
-                                builder: (context, snapshot) {
-                                  if (snapshot.connectionState == ConnectionState.waiting) {
-                                    return const CircularProgressIndicator();
-                                  } else if (snapshot.hasError) {
-                                    return Text('Error: ${snapshot.error}');
-                                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                                    return const Text('No hay estados civiles disponibles');
-                                  } else {
-                                    final estados = snapshot.data!;
-                                    return DropdownButtonFormField<int>(
-                                      value: _selectedEstadoCivilId,
-                                      decoration: InputDecoration(
-                                        labelText: 'Seleccione un estado civil',
-                                        border: UnderlineInputBorder(
-                                          borderRadius: BorderRadius.circular(8),
-                                        ),
-                                        filled: true,
-                                        fillColor: Colors.white,
-                                      ),
-                                      items: estados.map<DropdownMenuItem<int>>((estado) {
-                                        return DropdownMenuItem<int>(
-                                          value: estado['esCi_Id'],
-                                          child: Text(estado['esCi_Descripcion']),
-                                        );
-                                      }).toList(),
-                                      onChanged: (value) {
-                                        setState(() {
-                                          _selectedEstadoCivilId = value;
-                                        });
-                                      },
-                                      validator: (value) =>
-                                          value == null ? 'Seleccione un estado civil' : null,
-                                    );
-                                  }
-                                },
-                              ),
-                              const SizedBox(height: 16),
-                              const Text(
-                                'Municipio',
-                                style: TextStyle(
-                                  color: Colors.black87,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              FutureBuilder<List<dynamic>>(
-                                future: municipiosList,
-                                builder: (context, snapshot) {
-                                  if (snapshot.connectionState == ConnectionState.waiting) {
-                                    return const CircularProgressIndicator();
-                                  } else if (snapshot.hasError) {
-                                    return Text('Error: ${snapshot.error}');
-                                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                                    return const Text('No hay municipios disponibles');
-                                  } else {
-                                    final municipios = snapshot.data!;
-                                    return DropdownButtonFormField<String>(
-                                      value: _selectedMunicipioId,
-                                      decoration: InputDecoration(
-                                        labelText: 'Seleccione un municipio',
-                                        border: UnderlineInputBorder(
-                                          borderRadius: BorderRadius.circular(8),
-                                        ),
-                                        filled: true,
-                                        fillColor: Colors.white,
-                                      ),
-                                      items: municipios.map<DropdownMenuItem<String>>((muni) {
-                                        return DropdownMenuItem<String>(
-                                          value: muni['muni_Codigo'],
-                                          child: Text(muni['muni_Descripcion']),
-                                        );
-                                      }).toList(),
-                                      onChanged: (value) {
-                                        setState(() {
-                                          _selectedMunicipioId = value;
-                                        });
-                                      },
-                                      validator: (value) =>
-                                          value == null ? 'Seleccione un municipio' : null,
-                                    );
-                                  }
-                                },
-                              ),
                             ],
                           ),
                         ),
                       ),
-                      if(Paso2)
-                      ElevatedButton(
-                          onPressed: _cargando ? null : _registrarUsuario ,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: primaryColor,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 100),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            elevation: 0,
-                            disabledBackgroundColor: primaryColor.withOpacity(
-                              0.7,
-                            ),
-                          ),
-                          child: _cargando
-                              ? const SizedBox(
-                                  height: 30,
-                                  width: 30,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: Colors.white,
-                                  ),
-                                )
-                              : const Text(
-                                  'Registrarse',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                        ),
-
-                      // ElevatedButton(
-                      //   onPressed: _cargando ? null : _registrarUsuario,
-                      //   style: ElevatedButton.styleFrom(
-                      //     backgroundColor: primaryColor,
-                      //     foregroundColor: Colors.white,
-                      //     padding: const EdgeInsets.symmetric(vertical: 16),
-                      //     shape: RoundedRectangleBorder(
-                      //       borderRadius: BorderRadius.circular(8),
-                      //     ),
-                      //     elevation: 0,
-                      //     disabledBackgroundColor: primaryColor.withOpacity(0.7),
-                      //   ),
-                      //   child: _cargando
-                      //       ? const SizedBox(
-                      //           height: 20,
-                      //           width: 20,
-                      //           child: CircularProgressIndicator(
-                      //             strokeWidth: 2,
-                      //             color: Colors.white,
-                      //           ),
-                      //         )
-                      //       : const Text(
-                      //           'Registrar',
-                      //           style: TextStyle(
-                      //             fontSize: 16,
-                      //             fontWeight: FontWeight.bold,
-                      //           ),
-                      //         ),
-                      // ),
-                      const SizedBox(height: 30),
-
-                      if (_mensaje.isNotEmpty)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 16),
-                          child: Text(
-                            _mensaje,
-                            style: TextStyle(
-                              color: _mensaje.contains('éxito')
-                                  ? Colors.green
-                                  : Colors.red,
-                              fontSize: 14,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                    ],
+                    ),
                   ),
                 ),
               ),
-            ),
+            ],
           ),
         ),
       ),
+    );
+  }
+  
+  // Métodos para construir los componentes del stepper
+  Widget _buildStepperDot(int step, String label) {
+    bool isActive = _currentStep >= step;
+    return Expanded(
+      child: Column(
+        children: [
+          Container(
+            width: 30,
+            height: 30,
+            decoration: BoxDecoration(
+              color: isActive ? const Color(0xFFFF6B00) : Colors.grey,
+              shape: BoxShape.circle,
+            ),
+            child: Center(
+              child: Text(
+                (step + 1).toString(),
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              color: isActive ? Colors.white : Colors.grey,
+              fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  
+  Widget _buildStepperLine() {
+    return const Expanded(
+      child: Divider(
+        color: Colors.grey,
+        thickness: 2,
+      ),
+    );
+  }
+  
+  // Contenido del primer paso - Información de cuenta
+  Widget _buildStep1Content() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const Text(
+          'Información de Cuenta',
+          style: TextStyle(
+            color: Color(0xFFFF6B00),
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 16),
+        const Text(
+          'Foto de Perfil',
+          style: TextStyle(
+            color: Colors.black87,
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Center(
+          child: GestureDetector(
+            onTap: _pickUsuaImage,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: _selectedUsuaImagen == null
+                  ? Container(
+                      height: 120,
+                      width: 120,
+                      color: Colors.white,
+                      child: const Icon(Icons.add_photo_alternate_outlined, size: 40),
+                    )
+                  : Image.file(
+                      _selectedUsuaImagen!,
+                      height: 120,
+                      width: 120,
+                      fit: BoxFit.cover,
+                    ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        const Text(
+          'Nombre de Usuario',
+          style: TextStyle(
+            color: Colors.black87,
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 4),
+        TextFormField(
+          controller: _usuaNombreController,
+          decoration: InputDecoration(
+            hintText: 'Ingrese el nombre de usuario',
+            fillColor: Colors.white,
+            filled: true,
+            border: UnderlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        const Text(
+          'Contraseña',
+          style: TextStyle(
+            color: Colors.black87,
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 4),
+        TextFormField(
+          controller: _usuaContrasenaController,
+          obscureText: true,
+          decoration: InputDecoration(
+            hintText: 'Ingrese la contraseña',
+            fillColor: Colors.white,
+            filled: true,
+            border: UnderlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        const Text(
+          'Correo Electrónico',
+          style: TextStyle(
+            color: Colors.black87,
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 4),
+        TextFormField(
+          controller: _correoController,
+          keyboardType: TextInputType.emailAddress,
+          decoration: InputDecoration(
+            hintText: 'Ingrese el correo electrónico',
+            fillColor: Colors.white,
+            filled: true,
+            border: UnderlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+  
+  // Contenido del segundo paso - Información personal
+  Widget _buildStep2Content() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const Text(
+          'Datos Personales',
+          style: TextStyle(
+            color: Color(0xFFFF6B00),
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 16),
+        const Text(
+          'DNI',
+          style: TextStyle(
+            color: Colors.black87,
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 4),
+        TextFormField(
+          controller: _persDNIController,
+          decoration: InputDecoration(
+            hintText: 'Ingrese el DNI',
+            fillColor: Colors.white,
+            filled: true,
+            border: UnderlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        const Text(
+          'Nombres',
+          style: TextStyle(
+            color: Colors.black87,
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 4),
+        TextFormField(
+          controller: _persNombresController,
+          decoration: InputDecoration(
+            hintText: 'Ingrese los nombres',
+            fillColor: Colors.white,
+            filled: true,
+            border: UnderlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        const Text(
+          'Apellidos',
+          style: TextStyle(
+            color: Colors.black87,
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 4),
+        TextFormField(
+          controller: _persApellidosController,
+          decoration: InputDecoration(
+            hintText: 'Ingrese los apellidos',
+            fillColor: Colors.white,
+            filled: true,
+            border: UnderlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        const Text(
+          'Sexo',
+          style: TextStyle(
+            color: Colors.black87,
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 4),
+        ToggleButtons(
+          isSelected: [
+            _persSexo == 'M',
+            _persSexo == 'F',
+          ],
+          onPressed: (index) {
+            setState(() {
+              _persSexo = index == 0 ? 'M' : 'F';
+            });
+          },
+          borderRadius: BorderRadius.circular(8),
+          selectedColor: Colors.white,
+          fillColor: _persSexo == 'M' 
+              ? const Color.fromARGB(255, 38, 107, 255) 
+              : const Color.fromARGB(255, 255, 38, 161),
+          color: Colors.black87,
+          constraints: const BoxConstraints(minHeight: 40, minWidth: 165),
+          children: const [
+            Column(
+              children: [
+                SizedBox(height: 10),
+                Row(
+                  children: [
+                    Icon(Icons.man_sharp),
+                    Text('Masculino')
+                  ],
+                )
+              ],
+            ),
+            Column(
+              children: [
+                SizedBox(height: 10),
+                Row(
+                  children: [
+                    Icon(Icons.woman_sharp),
+                    Text('Femenino')
+                  ],
+                )
+              ],
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+  
+  // Contenido del tercer paso - Información de contacto
+  Widget _buildStep3Content() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const Text(
+          'Datos de Contacto',
+          style: TextStyle(
+            color: Color(0xFFFF6B00),
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 16),
+        const Text(
+          'Teléfono',
+          style: TextStyle(
+            color: Colors.black87,
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 4),
+        TextFormField(
+          controller: _persTelefonoController,
+          keyboardType: TextInputType.phone,
+          decoration: InputDecoration(
+            hintText: 'Ingrese el teléfono',
+            fillColor: Colors.white,
+            filled: true,
+            border: UnderlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        const Text(
+          'Dirección',
+          style: TextStyle(
+            color: Colors.black87,
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 4),
+        TextFormField(
+          controller: _persDireccionController,
+          decoration: InputDecoration(
+            hintText: 'Ingrese la dirección',
+            fillColor: Colors.white,
+            filled: true,
+            border: UnderlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        const Text(
+          'Estado Civil',
+          style: TextStyle(
+            color: Colors.black87,
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 4),
+        FutureBuilder<List<dynamic>>(
+          future: estadosCivilesList,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const CircularProgressIndicator();
+            } else if (snapshot.hasError) {
+              return Text('Error: ${snapshot.error}');
+            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return const Text('No hay estados civiles disponibles');
+            } else {
+              final estados = snapshot.data!;
+              return DropdownButtonFormField<int>(
+                value: _selectedEstadoCivilId,
+                decoration: InputDecoration(
+                  labelText: 'Seleccione un estado civil',
+                  border: UnderlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  filled: true,
+                  fillColor: Colors.white,
+                ),
+                items: estados.map<DropdownMenuItem<int>>((estado) {
+                  return DropdownMenuItem<int>(
+                    value: estado['esCi_Id'],
+                    child: Text(estado['esCi_Descripcion']),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _selectedEstadoCivilId = value;
+                  });
+                },
+              );
+            }
+          },
+        ),
+        const SizedBox(height: 16),
+        const Text(
+          'Municipio',
+          style: TextStyle(
+            color: Colors.black87,
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 4),
+        FutureBuilder<List<dynamic>>(
+          future: municipiosList,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const CircularProgressIndicator();
+            } else if (snapshot.hasError) {
+              return Text('Error: ${snapshot.error}');
+            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return const Text('No hay municipios disponibles');
+            } else {
+              final municipios = snapshot.data!;
+              return DropdownButtonFormField<String>(
+                value: _selectedMunicipioId,
+                decoration: InputDecoration(
+                  labelText: 'Seleccione un municipio',
+                  border: UnderlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  filled: true,
+                  fillColor: Colors.white,
+                ),
+                items: municipios.map<DropdownMenuItem<String>>((muni) {
+                  return DropdownMenuItem<String>(
+                    value: muni['muni_Codigo'],
+                    child: Text(muni['muni_Descripcion']),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _selectedMunicipioId = value;
+                  });
+                },
+              );
+            }
+          },
+        ),
+      ],
     );
   }
 }
