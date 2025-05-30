@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'dart:developer' as developer;
+import 'dart:ffi';
+import 'package:cloudinary_url_gen/transformation/common.dart';
 import 'package:http/http.dart' as http;
 import '../models/usuarioViewModel.dart';
 import '../services/globalService.dart';
@@ -434,5 +436,36 @@ class PlazaService {
 
 
 
+  Future<List<dynamic>> listarPlazas() async {
 
+    final url = Uri.parse('http://$apiServer/api/Plazas/ListarPlazas');
+    developer.log('Get plazas Request URL: $url');
+
+    try {
+
+        final response = await http.get(
+          url,
+          headers: {'Content-Type': 'application/json', 'X-Api-Key': _apikey},
+        );
+
+        developer.log('Get Tipos Contrato Response Status: ${response.statusCode}');
+        developer.log('Get Tipos Contrato Response Body: ${response.body}');
+
+        if (response.statusCode == 200) {
+
+          final List<dynamic> plazaslist = jsonDecode(response.body);
+          return plazaslist;
+
+        } else {
+          throw Exception(
+            'Error en la solicitud: Código ${response.statusCode}, Respuesta: ${response.body}',
+          );
+        }
+      } catch (e) {
+        developer.log('listar plazas Error: $e');
+        throw Exception('Error al listar plazas: $e');
+      }
+
+
+  }
 }

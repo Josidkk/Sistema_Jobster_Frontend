@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jobster/screen/principalPlazasScreen.dart';
 import 'screen/pre-login.dart';
 import 'screen/publicarPlazaScreen.dart';
 import 'screen/perfilScreen.dart';
@@ -36,7 +37,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _selectedIndex = 0;
 
   final List<Widget> _pages = [
-    const Center(child: Text('Inicio')),
+    const PrincipalPlazasScreen(),
+    // const Center(child: Text('Inicio')),
     const PublicarPlazaScreen(),
     const PerfilScreen(),
   ];
