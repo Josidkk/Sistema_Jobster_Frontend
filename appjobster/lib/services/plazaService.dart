@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'dart:developer' as developer;
+import 'dart:ffi';
+import 'package:cloudinary_url_gen/transformation/common.dart';
 import 'package:http/http.dart' as http;
 import '../models/usuarioViewModel.dart';
 import '../services/globalService.dart';
@@ -434,5 +436,96 @@ class PlazaService {
 
 
 
+  Future<List<dynamic>> listarPlazas() async {
 
+    final url = Uri.parse('http://$apiServer/api/Plazas/ListarPlazas');
+    developer.log('Get plazas Request URL: $url');
+
+    try {
+
+        final response = await http.get(
+          url,
+          headers: {'Content-Type': 'application/json', 'X-Api-Key': _apikey},
+        );
+
+        developer.log('Get Tipos Contrato Response Status: ${response.statusCode}');
+        developer.log('Get Tipos Contrato Response Body: ${response.body}');
+
+        if (response.statusCode == 200) {
+
+          final List<dynamic> plazaslist = jsonDecode(response.body);
+          return plazaslist;
+
+        } else {
+          throw Exception(
+            'Error en la solicitud: Código ${response.statusCode}, Respuesta: ${response.body}',
+          );
+        }
+      } catch (e) {
+        developer.log('listar plazas Error: $e');
+        throw Exception('Error al listar plazas: $e');
+      }
+
+
+  }
+
+  Future<List<dynamic>> buscarPlaza(String plazaid) async {
+
+    final requestBody = {
+
+      
+      "plaz_Id": plazaid,
+      "plaz_Descripcion": "string",
+      "plaz_Informacion": "string",
+      "plaz_Direccion": "string",
+      "plaz_Telefono": "string",
+      "plaz_Correo": "string",
+      "plaz_Imagen": "string",
+      "muni_Codigo": "string",
+      "cate_Id": 0,
+      "usua_Id": 0,
+      "carg_Id": 0,
+      "tiCo_Id": 0,
+      "plaz_Estado": true,
+      "usua_Creacion": 0,
+      "plaz_FechaCreacion": "2025-05-30T18:40:05.381Z",
+      "usua_Modificacion": 0,
+      "plaz_FechaModificacion": "2025-05-30T18:40:05.381Z"
+    
+
+    };
+
+    final url = Uri.parse('http://$apiServer/api/Plazas/BuscarPlaza');
+    developer.log('Get plazas Request URL: $url');
+
+    try {
+
+        final response = await http.post(
+          url,
+          headers: {'Content-Type': 'application/json', 'X-Api-Key': _apikey},
+          body: jsonEncode(requestBody)
+        );
+
+        developer.log('buscar plaza Response Status: ${response.statusCode}');
+        developer.log('buscar plaza Response Body: ${response.body}');
+
+        if (response.statusCode == 200) {
+
+          final List<dynamic> plazaslist = jsonDecode(response.body);
+          return plazaslist;
+
+        } else {
+          throw Exception(
+            'Error en la solicitud: Código ${response.statusCode}, Respuesta: ${response.body}',
+          );
+        }
+      } catch (e) {
+        developer.log('buscar plaza Error: $e');
+        throw Exception('Error al buscar plaza: $e');
+      }
+
+
+  }
+
+  
 }
