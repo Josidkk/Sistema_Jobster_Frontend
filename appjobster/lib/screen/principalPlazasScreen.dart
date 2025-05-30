@@ -427,7 +427,7 @@ void _publicarPlaza() async {
                                 //   ],
                                 // )
 
-                                Row(
+Row(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: [
     Expanded(
@@ -447,11 +447,11 @@ void _publicarPlaza() async {
                 borderRadius: BorderRadius.zero, // No rounded corners
                 child: Image.network(
                   plaza['plaz_Imagen'] ?? '',
-                  width: 110,
+                  width: 150,
                   height: 300,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) => Container(
-                    width: 110,
+                    width: 150,
                     height: 300,
                     color: Colors.grey[300],
                     child: const Icon(Icons.broken_image, size: 40, color: Colors.grey),
@@ -478,18 +478,18 @@ void _publicarPlaza() async {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 6),
-                      // Information (large text, max 3 lines)
+                      const SizedBox(height: 4),
+                      // Information (large text, max 4 lines)
                       Text(
                         plaza['plaz_Informacion'] ?? '',
                         style: const TextStyle(
                           fontSize: 15,
                           color: Colors.black87,
                         ),
-                        maxLines: 3,
+                        maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 8),
                       // Municipio
                       Row(
                         children: [
@@ -497,7 +497,7 @@ void _publicarPlaza() async {
                           const SizedBox(width: 6),
                           Expanded(
                             child: Text(
-                              plaza['muni_Codigo'] ?? 'Municipio',
+                              plaza['muni_Descripcion'] ?? 'Municipio',
                               style: const TextStyle(
                                 fontSize: 15,
                                 color: Colors.black87,
@@ -508,7 +508,7 @@ void _publicarPlaza() async {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 6),
                       // Categoria
                       Row(
                         children: [
@@ -527,7 +527,7 @@ void _publicarPlaza() async {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 6),
                       // Cargo
                       Row(
                         children: [
@@ -546,6 +546,31 @@ void _publicarPlaza() async {
                           ),
                         ],
                       ),
+                      const Spacer(),
+                      // Button with less height
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            // TODO: Add your navigation logic here
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFEE4D00),
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 8), // Less height
+                          ),
+                          child: const Text(
+                            'Ver Mas',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                            ),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -557,6 +582,9 @@ void _publicarPlaza() async {
     ),
   ],
 ),
+
+
+
 
                                 ).toList(),
 
