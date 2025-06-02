@@ -4,6 +4,7 @@ import 'screen/pre-login.dart';
 import 'screen/publicarPlazaScreen.dart';
 import 'screen/perfilScreen.dart';
 import 'screen/listarAprobadosScreen.dart';
+import 'screen/dashboardScreen.dart';
 import 'services/navigation_service.dart';
 import 'services/Session.dart';
 
@@ -81,6 +82,15 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         ),
       );
     }
+    
+    // Añadir la pestaña de Dashboard
+    tabs.add(
+      _TabConfig(
+        icon: Icons.dashboard,
+        label: 'Dashboard',
+        page: const DashboardScreen(),
+      ),
+    );
 
     tabs.add(
       _TabConfig(
