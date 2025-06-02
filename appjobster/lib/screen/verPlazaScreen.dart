@@ -1,3 +1,5 @@
+// import 'dart:nativewrappers/_internal/vm/lib/ffi_allocation_patch.dart';
+
 import 'package:jobster/services/Session.dart';
 
 import '../models/UsuarioViewModel.dart';
@@ -41,6 +43,8 @@ class _VerPlazaScreenState extends State<VerPlazaScreen> {
   late final categoriasList;
   late final tiposContratoList;
   late final plazasList;
+  late final solicitudesList;
+  late final guardadosList;
   late final List listadomunicipios;
 
 
@@ -55,30 +59,185 @@ class _VerPlazaScreenState extends State<VerPlazaScreen> {
     plazasList = await _plazaService.listarPlazas();
   }
 
-  
+
     Future<void> llenarMunicipios() async {
 
-    
+
     try {
       final listadomuni = await _plazaService.getMunicipios();
-    
+
       if (listadomuni != null) {
-        
+
         listadomunicipios = listadomuni;
 
-        
+
       } else {
-        
+
         debugPrint('listado vacio muni');
       }
     } catch (e) {
-      
+
       debugPrint('Error al cargar municipioslist: $e');
     }
 
 
 
-  } 
+  }
+
+  void _enviarSolicitud(String? plazaid, String? usuaid) async {
+  // if (_formKey.currentState!.validate()) {
+  //   setState(() {
+  //     _cargando = true;
+  //     _mensaje = '';
+  //   });
+
+    try {
+
+      final respuesta = await _plazaService.crearSolicitud(plazaid, usuaid);
+
+
+        if (respuesta.toString().toLowerCase().contains('creada')) {
+          setState(() {
+            _mensaje = 'Solicitud enviada';
+          });
+        } else {
+          setState(() {
+            _mensaje = 'Error al enviar solicitud: $respuesta';
+            _cargando = false;
+          });
+        }
+
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => VerPlazaScreen()),
+          );
+        
+
+    } catch (e) {
+      setState(() {
+        _mensaje = 'ERROR AL Enviar Solicitud $e';
+        _cargando = false;
+      });
+    } finally {
+      setState(() {
+        _cargando = false;
+      });
+    }
+  }
+
+  void _cancelarSolicitud(String? soliId) async {
+  // if (_formKey.currentState!.validate()) {
+  //   setState(() {
+  //     _cargando = true;
+  //     _mensaje = '';
+  //   });
+
+    try {
+
+      final respuesta = await _plazaService.eliminarSolicitud(soliId);
+
+
+        if (respuesta.toString().toLowerCase().contains('eliminada')) {
+          setState(() {
+            _mensaje = 'Solicitud Cancelada';
+          });
+        } else {
+          setState(() {
+            _mensaje = 'Error al cancelar solicitud: $respuesta';
+            _cargando = false;
+          });
+        }
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => VerPlazaScreen()),
+        );
+        
+
+    } catch (e) {
+      setState(() {
+        _mensaje = 'ERROR AL Cancelar Solicitud $e';
+        _cargando = false;
+      });
+    } finally {
+      setState(() {
+        _cargando = false;
+      });
+    }
+  }
+
+
+  void _guardarPlaza(String? plazaid, String? usuaid) async {
+
+    try {
+
+      final respuesta = await _plazaService.crearGuardado(plazaid, usuaid);
+
+
+        if (respuesta.toString().toLowerCase().contains('creada')) {
+          setState(() {
+            _mensaje = 'Plaza guardada';
+          });
+        } else {
+          setState(() {
+            _mensaje = 'Error al guardar plaza: $respuesta';
+            _cargando = false;
+          });
+        }
+
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => VerPlazaScreen()),
+          );
+        
+
+    } catch (e) {
+      setState(() {
+        _mensaje = 'ERROR AL guardar plaza $e';
+        _cargando = false;
+      });
+    } finally {
+      setState(() {
+        _cargando = false;
+      });
+    }
+  }
+
+  void _descartarGuardado(String? guardadoId) async {
+
+    try {
+
+      final respuesta = await _plazaService.eliminarGuardado(guardadoId);
+
+
+        if (respuesta.toString().toLowerCase().contains('eliminada')) {
+          setState(() {
+            _mensaje = 'Plaza descartada de Guardados';
+          });
+        } else {
+          setState(() {
+            _mensaje = 'Error al descartar plaza: $respuesta';
+            _cargando = false;
+          });
+        }
+
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => VerPlazaScreen()),
+          );
+        
+
+    } catch (e) {
+      setState(() {
+        _mensaje = 'ERROR AL descartar plaza $e';
+        _cargando = false;
+      });
+    } finally {
+      setState(() {
+        _cargando = false;
+      });
+    }
+  }
 
 
   @override
@@ -89,9 +248,11 @@ class _VerPlazaScreenState extends State<VerPlazaScreen> {
     municipiosList = _plazaService.getMunicipios();
     tiposContratoList = _plazaService.getTiposContrato();
     plazasList = _plazaService.buscarPlaza(Session.plaza_Id!);
+    solicitudesList = _plazaService.getSolicitudes();
+    guardadosList = _plazaService.getGuardados();
     llenarMunicipios();
 
-    
+
   }
 
   @override
@@ -101,7 +262,7 @@ class _VerPlazaScreenState extends State<VerPlazaScreen> {
     super.dispose();
   }
 
-  
+
 
   // Helper widget for details
   Widget _detalleItem(IconData icon, String label, String value) {
@@ -185,7 +346,13 @@ Widget build(BuildContext context) {
                         future: plazasList,
                         builder: (context, snapshot) {
                           if (snapshot.connectionState == ConnectionState.waiting) {
-                            return const CircularProgressIndicator();
+                            // return LinearProgressIndicator();
+                            return SizedBox(
+                              height: 300,
+                              
+                              
+                              child: CircularProgressIndicator(),
+                            );
                           } else if (snapshot.hasError) {
                             return Text('Error: ${snapshot.error}');
                           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -213,7 +380,7 @@ Widget build(BuildContext context) {
 
 
 
-                            
+
 
                             return Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
@@ -258,41 +425,251 @@ Widget build(BuildContext context) {
                                   const SizedBox(height: 10),
                                   Row(
                                     children: [
-                                      Expanded(
-                                        child: ElevatedButton.icon(
-                                          onPressed: () {
-                                            // TODO: Solicitar plaza
-                                          },
-                                          icon: const Icon(Icons.send),
-                                          label: const Text('Solicitar'),
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: primaryColor,
-                                            foregroundColor: Colors.white,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(6),
-                                            ),
-                                            padding: const EdgeInsets.symmetric(vertical: 10),
+
+
+                                      FutureBuilder<List<dynamic>>(
+                                            future: solicitudesList,
+                                            builder: (context, solicitudesSnapshot) {
+                                              if (solicitudesSnapshot.connectionState == ConnectionState.waiting) {
+                                                return Expanded(
+                                                  child: LinearProgressIndicator()
+                                                  );
+                                              } else if (solicitudesSnapshot.hasError) {
+                                                return 
+                                                Expanded(
+                                                    child: 
+                                                    // ElevatedButton.icon(
+                                                    //   onPressed: () {
+
+                                                    //     // TODO: Solicitar plaza
+                                                    //   },
+                                                    //   icon: const Icon(Icons.send),
+                                                    //   label: const Text('NO INFO'),
+                                                    //   style: ElevatedButton.styleFrom(
+                                                    //     backgroundColor: primaryColor,
+                                                    //     foregroundColor: Colors.white,
+                                                    //     shape: RoundedRectangleBorder(
+                                                    //       borderRadius: BorderRadius.circular(6),
+                                                    //     ),
+                                                    //     padding: const EdgeInsets.symmetric(vertical: 10),
+                                                    //   ),
+                                                    // ),
+                                                    LinearProgressIndicator()
+
+                                                  );
+                                              } 
+                                              // else if (!solicitudesSnapshot.hasData || solicitudesSnapshot.data!.isEmpty) {                                                
+                                              // } 
+                                              else {
+
+                                                final solicitudes = solicitudesSnapshot.data!;
+
+                                                final solicitudesfinal = solicitudes.where(
+                                                  (m) => m['plaz_Id'].toString() == Session.plaza_Id &&
+                                                  m['usua_Id'] == Session.usuario_id
+
+                                                );
+
+                                                if (solicitudesfinal.isEmpty) {
+
+                                                  return (Expanded(
+                                                    child: ElevatedButton.icon(
+                                                      onPressed: () {
+                                                        _enviarSolicitud(Session.plaza_Id, Session.usuario_id.toString());
+                                                        
+                                                        
+                                                        // TODO: Solicitar plaza
+                                                      },
+                                                      icon: const Icon(Icons.send),
+                                                      label: const Text('Solicitar'),
+                                                      style: ElevatedButton.styleFrom(
+                                                        backgroundColor: primaryColor,
+                                                        foregroundColor: Colors.white,
+                                                        shape: RoundedRectangleBorder(
+                                                          borderRadius: BorderRadius.circular(6),
+                                                        ),
+                                                        padding: const EdgeInsets.symmetric(vertical: 10),
+                                                      ),
+                                                    ),
+                                                  )
+                                                  );
+
+                                                }
+                                                else{
+                                                  return (
+                                                    Expanded(
+                                                      child: ElevatedButton.icon(
+                                                        onPressed: () {
+                                                          // _enviarSolicitud(Session.plaza_Id, Session.usuario_id.toString());
+                                                          _cancelarSolicitud(solicitudesfinal.first['soli_Id'].toString());
+                                                          
+                                                        
+                                                        
+
+                                                          // TODO: Solicitar plaza
+                                                        },
+                                                        icon: const Icon(Icons.cancel_sharp),
+                                                        label: const Text('Cancelar Solicitud'),
+                                                        style: ElevatedButton.styleFrom(
+                                                          backgroundColor: primaryColor,
+                                                          foregroundColor: Colors.white,
+                                                          shape: RoundedRectangleBorder(
+                                                            borderRadius: BorderRadius.circular(6),
+                                                          ),
+                                                          padding: const EdgeInsets.symmetric(vertical: 10),
+                                                        ),
+                                                      ),
+                                                    )
+                                                  );
+                                                }
+
+
+                                              }
+                                            },
+
                                           ),
-                                        ),
-                                      ),
+
+
+                                      // Expanded(
+                                      //   child: ElevatedButton.icon(
+                                      //     onPressed: () {
+                                      //       _enviarSolicitud(Session.plaza_Id, Session.usuario_id.toString());
+                                      //       // TODO: Solicitar plaza
+                                      //     },
+                                      //     icon: const Icon(Icons.send),
+                                      //     label: const Text('Solicitar'),
+                                      //     style: ElevatedButton.styleFrom(
+                                      //       backgroundColor: primaryColor,
+                                      //       foregroundColor: Colors.white,
+                                      //       shape: RoundedRectangleBorder(
+                                      //         borderRadius: BorderRadius.circular(6),
+                                      //       ),
+                                      //       padding: const EdgeInsets.symmetric(vertical: 10),
+                                      //     ),
+                                      //   ),
+                                      // ),
+
+
                                       const SizedBox(width: 12),
-                                      Expanded(
-                                        child: OutlinedButton.icon(
-                                          onPressed: () {
-                                            // TODO: Guardar plaza
-                                          },
-                                          icon: const Icon(Icons.bookmark_border),
-                                          label: const Text('Guardar'),
-                                          style: OutlinedButton.styleFrom(
-                                            foregroundColor: primaryColor,
-                                            side: const BorderSide(color: primaryColor),
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(6),
-                                            ),
-                                            padding: const EdgeInsets.symmetric(vertical: 10),
+                                      
+
+
+                                          FutureBuilder<List<dynamic>>(
+                                            future: guardadosList,
+                                            builder: (context, guardadosSnapshot) {
+                                              if (guardadosSnapshot.connectionState == ConnectionState.waiting) {
+                                                return Expanded(
+                                                  child: LinearProgressIndicator()
+                                                  );
+                                              } else if (guardadosSnapshot.hasError) {
+                                                return 
+                                                Expanded(
+                                                    child: 
+                                                    // ElevatedButton.icon(
+                                                    //   onPressed: () {
+
+                                                    //   },
+                                                    //   icon: const Icon(Icons.send),
+                                                    //   label: const Text('NO INFO'),
+                                                    //   style: ElevatedButton.styleFrom(
+                                                    //     backgroundColor: primaryColor,
+                                                    //     foregroundColor: Colors.white,
+                                                    //     shape: RoundedRectangleBorder(
+                                                    //       borderRadius: BorderRadius.circular(6),
+                                                    //     ),
+                                                    //     padding: const EdgeInsets.symmetric(vertical: 10),
+                                                    //   ),
+                                                    // ),
+                                                    LinearProgressIndicator()
+
+                                                  );
+                                              } 
+                                              // else if (!solicitudesSnapshot.hasData || solicitudesSnapshot.data!.isEmpty) {                                                
+                                              // } 
+                                              else {
+
+                                                final guardados = guardadosSnapshot.data!;
+
+                                                final guardadosfinal = guardados.where(
+                                                  (m) => m['plaz_Id'].toString() == Session.plaza_Id &&
+                                                  m['usua_Id'] == Session.usuario_id
+
+                                                );
+
+                                                if (guardadosfinal.isEmpty) {
+
+                                                  return (
+                                                    Expanded(
+                                                      child: OutlinedButton.icon(
+                                                        onPressed: () {
+                                                          _guardarPlaza(Session.plaza_Id, Session.usuario_id.toString());
+                                                          
+                                                        },
+                                                        icon: const Icon(Icons.bookmark_border),
+                                                        label: const Text('Guardar'),
+                                                        style: OutlinedButton.styleFrom(
+                                                          foregroundColor: primaryColor,
+                                                          side: const BorderSide(color: primaryColor),
+                                                          shape: RoundedRectangleBorder(
+                                                            borderRadius: BorderRadius.circular(6),
+                                                          ),
+                                                          padding: const EdgeInsets.symmetric(vertical: 10),
+                                                        ),
+                                                      ),
+                                                    )
+                                                  );
+
+                                                }
+                                                else{
+                                                  return (
+                                                    Expanded(
+                                                      child: OutlinedButton.icon(
+                                                        onPressed: () {
+                                                          _descartarGuardado(guardadosfinal.first['guar_Id'].toString());
+                                                          
+                                                        },
+                                                        icon: const Icon(Icons.bookmark_added_sharp),
+                                                        label: const Text('Guardado'),
+                                                        style: OutlinedButton.styleFrom(
+                                                          backgroundColor: primaryColor,
+                                                          foregroundColor: const Color.fromARGB(255, 255, 255, 255),
+                                                          side: const BorderSide(color: primaryColor),
+                                                          shape: RoundedRectangleBorder(
+                                                            borderRadius: BorderRadius.circular(6),
+                                                          ),
+                                                          padding: const EdgeInsets.symmetric(vertical: 10),
+                                                        ),
+
+                                                      ),
+                                                    )
+                                                  );
+                                                }
+
+
+                                              }
+                                            },
+
                                           ),
-                                        ),
-                                      ),
+
+                                      // Expanded(
+                                      //   child: OutlinedButton.icon(
+                                      //     onPressed: () {
+
+
+                                      //       // TODO: Guardar plaza
+                                      //     },
+                                      //     icon: const Icon(Icons.bookmark_border),
+                                      //     label: const Text('Guardar'),
+                                      //     style: OutlinedButton.styleFrom(
+                                      //       foregroundColor: primaryColor,
+                                      //       side: const BorderSide(color: primaryColor),
+                                      //       shape: RoundedRectangleBorder(
+                                      //         borderRadius: BorderRadius.circular(6),
+                                      //       ),
+                                      //       padding: const EdgeInsets.symmetric(vertical: 10),
+                                      //     ),
+                                      //   ),
+                                      // ),
                                     ],
                                   ),
                                   const SizedBox(height: 24),
@@ -376,7 +753,7 @@ Widget build(BuildContext context) {
                                               }
                                             },
                                           ),
-                                          
+
 
                                           FutureBuilder<List<dynamic>>(
                                             future: tiposContratoList,
@@ -404,9 +781,9 @@ Widget build(BuildContext context) {
                                               }
                                             },
                                           ),
-                                          
+
                                           // _detalleItem(Icons.assignment, 'Tipo de Contrato', plazaTipoContrato),
-                                          
+
 
                                           FutureBuilder<List<dynamic>>(
                                             future: cargosList,
@@ -512,7 +889,7 @@ Widget build(BuildContext context) {
                           child: Text(
                             _mensaje,
                             style: TextStyle(
-                              color: _mensaje.contains('Bienvenido') || _mensaje.toLowerCase().contains('publicada')
+                              color: _mensaje.contains('enviada') || _mensaje.toLowerCase().contains('publicada')
                                   ? Colors.green
                                   : Colors.red,
                               fontSize: 14,
