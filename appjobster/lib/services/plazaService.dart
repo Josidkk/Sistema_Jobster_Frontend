@@ -3,6 +3,7 @@ import 'dart:developer' as developer;
 import 'dart:ffi';
 import 'package:cloudinary_url_gen/transformation/common.dart';
 import 'package:http/http.dart' as http;
+import 'package:jobster/services/Session.dart';
 import '../models/usuarioViewModel.dart';
 import '../services/globalService.dart';
 
@@ -75,7 +76,7 @@ class PlazaService {
 
 
   Future crearPlaza(String descripcion, String informacion, String imagen, String direccion,
-                    int? cate, int? carg, int? tico) async {
+                    int? cate, int? carg, int? tico, List<Map<String, String>> requisitos) async {
 
     final url = Uri.parse(_baseUrl);
 
@@ -125,6 +126,32 @@ class PlazaService {
         // } else {
         //   return Usuario.fromJson(jsonList[0]);
         // }
+
+        requisitos.forEach( (requisito) async {
+
+          final requisitoBody = {
+
+            "requ_Id": 0,
+            "requ_Descripcion": requisito['requ_Descripcion'],
+            "requ_Informacion": requisito['requ_Informacion'],
+            "requ_Estado": true,
+            "usua_Creacion": Session.usuario_id,
+            "plaz_Id": 0,
+            "requ_FechaCreacion": DateTime.now().toIso8601String(),
+            "usua_Modificacion": 0,
+            "requ_FechaModificacion": "2025-06-02T19:43:48.358Z"
+          };
+
+          final responseRequ = await http.post(
+            Uri.parse('http://$apiServer/api/Requisitos/InsertarRequisito'),
+            headers: {'Content-Type': 'application/json', 'X-Api-Key': _apikey},
+            body: jsonEncode(requisitoBody),
+          );
+
+          
+        }
+        );
+        
         return 'creada';
 
       } else {
@@ -388,7 +415,40 @@ class PlazaService {
     
   }
   
+  Future<List<dynamic>> getRequisitos() async{
+
+    final url = Uri.parse('http://$apiServer/api/Requisitos/ListarRequisitos');
+    developer.log('Get Guardados Request URL: $url');
+
+    try {
+
+        final response = await http.get(
+          url,
+          headers: {'Content-Type': 'application/json', 'X-Api-Key': _apikey},
+        );
+
+        developer.log('Get Requisitos Response Status: ${response.statusCode}');
+        developer.log('Get Requisitos Response Body: ${response.body}');
+
+        if (response.statusCode == 200) {
+
+          final List<dynamic> requisitoslist = jsonDecode(response.body);
+          return requisitoslist;
+
+        } else {
+          throw Exception(
+            'Error en la solicitud: Código ${response.statusCode}, Respuesta: ${response.body}',
+          );
+        }
+      } catch (e) {
+        developer.log('Get Requisitos Error: $e');
+        throw Exception('Error en la solicitud: $e');
+      }
+
+    
+  }
   
+
   Future crearPersonaUsuario(String nombre, String contrasena, String correo,
                      String imagen, String dni, String nombres, String apellidos,
                      String telefono, String? sexo, String direccion, int? estadocivil,
@@ -763,7 +823,7 @@ class PlazaService {
       "guar_FechaModificacion": "2025-06-02T09:49:20.622Z"
 
     };
-
+    
     developer.log('Guardado Request URL: $url');
     developer.log(
       'Guardado Request Headers: ${{'Content-Type': 'application/json', 'X-Api-Key': _apikey}}',

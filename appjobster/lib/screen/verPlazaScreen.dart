@@ -44,6 +44,7 @@ class _VerPlazaScreenState extends State<VerPlazaScreen> {
   late final tiposContratoList;
   late final plazasList;
   late final solicitudesList;
+  late final requisitosList;
   late final guardadosList;
   late final List listadomunicipios;
 
@@ -250,6 +251,8 @@ class _VerPlazaScreenState extends State<VerPlazaScreen> {
     plazasList = _plazaService.buscarPlaza(Session.plaza_Id!);
     solicitudesList = _plazaService.getSolicitudes();
     guardadosList = _plazaService.getGuardados();
+
+    requisitosList = _plazaService.getRequisitos();
     llenarMunicipios();
 
 
@@ -364,7 +367,7 @@ Widget build(BuildContext context) {
                             final String plazaImagen = plaza['plaz_Imagen'] ?? '';
                             final String plazaDescripcion = plaza['plaz_Descripcion'] ?? 'Título de la Plaza';
                             final String plazaInformacion = plaza['plaz_Informacion'] ?? 'Información detallada de la plaza...';
-                            final String plazaRequisitos = plaza['plaz_Requisitos'] ?? 'Requisitos de la plaza...';
+                            // final String plazaRequisitos = plaza['plaz_Requisitos'] ?? 'Requisitos de la plaza...';
                             final String plazaDireccion = plaza['plaz_Direccion'] ?? 'Dirección';
                             final String plazaMunicipio = plaza['muni_Descripcion'] ?? 'Municipio';
                             final String plazaTipoContrato = plaza['tico_Descripcion'] ?? 'Tipo de Contrato';
@@ -651,6 +654,7 @@ Widget build(BuildContext context) {
 
                                           ),
 
+
                                       // Expanded(
                                       //   child: OutlinedButton.icon(
                                       //     onPressed: () {
@@ -700,10 +704,94 @@ Widget build(BuildContext context) {
                                     ),
                                   ),
                                   const SizedBox(height: 8),
-                                  Text(
-                                    plazaRequisitos,
-                                    style: const TextStyle(fontSize: 16, color: Colors.black87),
+
+                                  FutureBuilder<List<dynamic>>(
+                                    future: requisitosList,
+                                    builder: (context, requisitosSnapshot) {
+                                      if (requisitosSnapshot.connectionState == ConnectionState.waiting) {
+                                        return const Padding(
+                                          padding: EdgeInsets.symmetric(vertical: 12),
+                                          child: LinearProgressIndicator(),
+                                        );
+                                      } else if (requisitosSnapshot.hasError) {
+                                        return const Padding(
+                                          padding: EdgeInsets.symmetric(vertical: 12),
+                                          child: Text('Error al cargar requisitos'),
+                                        );
+                                      } else if (!requisitosSnapshot.hasData || requisitosSnapshot.data!.isEmpty) {
+                                        return const Padding(
+                                          padding: EdgeInsets.symmetric(vertical: 12),
+                                          child: Text('No hay requisitos para esta plaza'),
+                                        );
+                                      } else {
+                                        final requisitos = requisitosSnapshot.data!;
+                                        final requisitosFinal = requisitos.where(
+                                          (r) => r['plaz_Id'].toString() == Session.plaza_Id,
+                                        ).toList();
+
+                                        if (requisitosFinal.isEmpty) {
+                                          return const Padding(
+                                            padding: EdgeInsets.symmetric(vertical: 12),
+                                            child: Text('No hay requisitos para esta plaza'),
+                                          );
+                                        }
+
+                                        return Card(
+                                          color: const Color(0xFFFFF3E0),
+                                          elevation: 0,
+                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: requisitosFinal.map<Widget>((req) {
+                                                return Padding(
+                                                  padding: const EdgeInsets.only(bottom: 10),
+                                                  child: Row(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      const Icon(Icons.arrow_right, color: Color(0xFFEE4D00), size: 24),
+                                                      const SizedBox(width: 6),
+                                                      Expanded(
+                                                        child: Column(
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                          children: [
+                                                            Text(
+                                                              req['requ_Descripcion'] ?? '',
+                                                              style: const TextStyle(
+                                                                fontWeight: FontWeight.bold,
+                                                                fontSize: 15,
+                                                                color: Color(0xFFEE4D00),
+                                                              ),
+                                                            ),
+                                                            const SizedBox(height: 2),
+                                                            Text(
+                                                              req['requ_Informacion'] ?? '',
+                                                              style: const TextStyle(
+                                                                fontSize: 15,
+                                                                color: Colors.black87,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                );
+                                              }).toList(),
+                                            ),
+                                          ),
+                                        );
+                                      }
+                                    },
                                   ),
+
+                                  
+
+                                  // Text(
+                                  //   plazaRequisitos,
+                                  //   style: const TextStyle(fontSize: 16, color: Colors.black87),
+                                  // ),
                                   const SizedBox(height: 24),
 
                                   // Detalles de la plaza
