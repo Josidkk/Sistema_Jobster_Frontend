@@ -16,6 +16,7 @@ class Usuario {
   final int? usua_Modificacion;
   final DateTime? usua_FechaModificacion;
   final bool usua_Estado;
+  final bool? usua_Aprobado;
 
   Usuario({
     this.usua_Id,
@@ -35,6 +36,7 @@ class Usuario {
     this.usua_Modificacion,
     this.usua_FechaModificacion,
     required this.usua_Estado,
+    this.usua_Aprobado,
   });
 
   factory Usuario.fromJson(Map<String, dynamic> json) {
@@ -60,6 +62,7 @@ class Usuario {
           ? DateTime.parse(json['usua_FechaModificacion'])
           : null,
       usua_Estado: json['usua_Estado'] ?? false,
+      usua_Aprobado: json['usua_Aprobado'] ?? false,
     );
   }
 
@@ -82,6 +85,7 @@ class Usuario {
       'usua_Modificacion': usua_Modificacion,
       'usua_FechaModificacion': usua_FechaModificacion?.toIso8601String(),
       'usua_Estado': usua_Estado,
+      'usua_Aprobado': usua_Aprobado,
     };
   }
 }
