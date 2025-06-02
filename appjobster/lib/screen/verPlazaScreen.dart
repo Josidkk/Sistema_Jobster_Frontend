@@ -400,14 +400,71 @@ Widget build(BuildContext context) {
                                                 final String ticoDescripcion = tipocontrato != null
                                                     ? tipocontrato['tiCo_Descripcion']
                                                     : 'Municipio no encontrado';
-                                                return _detalleItem(Icons.location_city, 'Tipo de Contrato', ticoDescripcion);
+                                                return _detalleItem(Icons.assignment, 'Tipo de Contrato', ticoDescripcion);
                                               }
                                             },
                                           ),
                                           
-                                          _detalleItem(Icons.assignment, 'Tipo de Contrato', plazaTipoContrato),
-                                          _detalleItem(Icons.work, 'Cargo', plazaCargo),
-                                          _detalleItem(Icons.category, 'Categoría', plazaCategoria),
+                                          // _detalleItem(Icons.assignment, 'Tipo de Contrato', plazaTipoContrato),
+                                          
+
+                                          FutureBuilder<List<dynamic>>(
+                                            future: cargosList,
+                                            builder: (context, ticoSnapshot) {
+                                              if (ticoSnapshot.connectionState == ConnectionState.waiting) {
+                                                return const SizedBox(
+                                                  height: 20,
+                                                  child: LinearProgressIndicator(),
+                                                );
+                                              } else if (ticoSnapshot.hasError) {
+                                                return _detalleItem(Icons.location_city, 'Cargo', 'Error');
+                                              } else if (!ticoSnapshot.hasData || ticoSnapshot.data!.isEmpty) {
+                                                return _detalleItem(Icons.location_city, 'Cargo', 'No encontrado');
+                                              } else {
+                                                final tipos = ticoSnapshot.data!;
+                                                final int? ticoid = plaza['carg_Id'];
+                                                final tipocontrato = tipos.firstWhere(
+                                                  (m) => m['carg_Id'] == ticoid,
+                                                  orElse: () => null,
+                                                );
+                                                final String ticoDescripcion = tipocontrato != null
+                                                    ? tipocontrato['carg_Descripcion']
+                                                    : 'Cargo no encontrado';
+                                                return _detalleItem(Icons.work, 'Cargo', ticoDescripcion);
+                                              }
+                                            },
+                                          ),
+
+                                          // _detalleItem(Icons.work, 'Cargo', plazaCargo),
+
+                                          FutureBuilder<List<dynamic>>(
+                                            future: categoriasList,
+                                            builder: (context, ticoSnapshot) {
+                                              if (ticoSnapshot.connectionState == ConnectionState.waiting) {
+                                                return const SizedBox(
+                                                  height: 20,
+                                                  child: LinearProgressIndicator(),
+                                                );
+                                              } else if (ticoSnapshot.hasError) {
+                                                return _detalleItem(Icons.location_city, 'Categoria', 'Error');
+                                              } else if (!ticoSnapshot.hasData || ticoSnapshot.data!.isEmpty) {
+                                                return _detalleItem(Icons.location_city, 'Categoria', 'No encontrado');
+                                              } else {
+                                                final tipos = ticoSnapshot.data!;
+                                                final int? ticoid = plaza['cate_Id'];
+                                                final tipocontrato = tipos.firstWhere(
+                                                  (m) => m['cate_Id'] == ticoid,
+                                                  orElse: () => null,
+                                                );
+                                                final String ticoDescripcion = tipocontrato != null
+                                                    ? tipocontrato['cate_Descripcion']
+                                                    : 'Categoria no encontrada';
+                                                return _detalleItem(Icons.category, 'Categoría', ticoDescripcion);
+                                              }
+                                            },
+                                          ),
+
+                                          // _detalleItem(Icons.category, 'Categoría', plazaCategoria),
                                         ],
                                       ),
                                     ),
