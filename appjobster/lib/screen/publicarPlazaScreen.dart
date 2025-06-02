@@ -171,7 +171,6 @@ class _PublicarPlazaScreenState extends State<PublicarPlazaScreen> {
           final resJson = json.decode(resStr);
           final imageUrl = resJson['secure_url'];
 
-          // Do NOT send requisitos yet, just validate
           final respuesta = await _plazaService.crearPlaza(
             _tituloController.text.trim(),
             _informacionController.text.trim(),
@@ -180,7 +179,7 @@ class _PublicarPlazaScreenState extends State<PublicarPlazaScreen> {
             _selectedCategoriaId,
             _selectedCargoId,
             _selectedTipoContratoId,
-           _requisitos, 
+            _requisitos,
           );
 
           if (respuesta.toString().toLowerCase().contains('creada')) {
@@ -262,6 +261,7 @@ class _PublicarPlazaScreenState extends State<PublicarPlazaScreen> {
                   child: AnimatedSwitcher(
                     duration: const Duration(milliseconds: 350),
                     child: _currentSection == 0
+                        // SECTION 1: Imagen, Titulo, Informacion
                         ? Column(
                             key: const ValueKey(0),
                             mainAxisAlignment: MainAxisAlignment.start,
@@ -277,7 +277,6 @@ class _PublicarPlazaScreenState extends State<PublicarPlazaScreen> {
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.stretch,
                                     children: [
-                                      // Imagen
                                       _sectionTitle('Imagen de la Plaza'),
                                       GestureDetector(
                                         onTap: _pickImage,
@@ -334,134 +333,10 @@ class _PublicarPlazaScreenState extends State<PublicarPlazaScreen> {
                                           return null;
                                         },
                                       ),
-                                      const SizedBox(height: 12),
-                                      _sectionTitle('Dirección'),
-                                      _styledTextField(
-                                        controller: _direccionController,
-                                        hintText: 'Avenida X, Calle Y, Local Z',
-                                        fontSize: 15,
-                                        validator: (value) {
-                                          if (value == null || value.isEmpty) {
-                                            return 'Por favor ingrese la dirección';
-                                          }
-                                          return null;
-                                        },
-                                      ),
-                                      const SizedBox(height: 12),
-                                      _sectionTitle('Cargo'),
-                                      FutureBuilder<List<dynamic>>(
-                                        future: cargosList,
-                                        builder: (context, snapshot) {
-                                          if (snapshot.connectionState == ConnectionState.waiting) {
-                                            return const LinearProgressIndicator();
-                                          } else if (snapshot.hasError) {
-                                            return Text('Error: ${snapshot.error}');
-                                          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                                            return const Text('No hay cargos disponibles');
-                                          } else {
-                                            final cargos = snapshot.data!;
-                                            return DropdownButtonFormField<int>(
-                                              value: _selectedCargoId,
-
-                                              decoration: _dropdownDecoration('Cargo'),
-                                              items: cargos.map<DropdownMenuItem<int>>((cargo) {
-                                                return DropdownMenuItem<int>(
-                                                  value: cargo['carg_Id'],
-                                                  child: Text(cargo['carg_Descripcion']),
-                                                );
-                                              }).toList(),
-                                              onChanged: (value) {
-                                                setState(() {
-                                                  _selectedCargoId = value;
-                                                });
-                                              },
-                                              validator: (value) => value == null ? 'Por favor seleccione un cargo' : null,
-                                            );
-                                          }
-                                        },
-                                      ),
-                                      const SizedBox(height: 12),
-                                      _sectionTitle('Categoría'),
-                                      FutureBuilder<List<dynamic>>(
-                                        future: categoriasList,
-                                        builder: (context, snapshot) {
-                                          if (snapshot.connectionState == ConnectionState.waiting) {
-                                            return const LinearProgressIndicator();
-                                          } else if (snapshot.hasError) {
-                                            return Text('Error: ${snapshot.error}');
-                                          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                                            return const Text('No hay categorías disponibles');
-                                          } else {
-                                            final categorias = snapshot.data!;
-                                            return DropdownButtonFormField<int>(
-                                              value: _selectedCategoriaId,
-                                              decoration: _dropdownDecoration('Categoría'),
-                                              items: categorias.map<DropdownMenuItem<int>>((categoria) {
-                                                return DropdownMenuItem<int>(
-                                                  value: categoria['cate_Id'],
-                                                  child: Text(categoria['cate_Descripcion']),
-                                                );
-                                              }).toList(),
-                                              onChanged: (value) {
-                                                setState(() {
-                                                  _selectedCategoriaId = value;
-                                                });
-                                              },
-                                              validator: (value) => value == null ? 'Por favor seleccione una categoría' : null,
-                                            );
-                                          }
-                                        },
-                                      ),
-                                      const SizedBox(height: 12),
-                                      _sectionTitle('Tipo de Contrato'),
-                                      FutureBuilder<List<dynamic>>(
-                                        future: tiposContratoList,
-                                        builder: (context, snapshot) {
-                                          if (snapshot.connectionState == ConnectionState.waiting) {
-                                            return const LinearProgressIndicator();
-                                          } else if (snapshot.hasError) {
-                                            return Text('Error: ${snapshot.error}');
-                                          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                                            return const Text('No hay tipos de contrato disponibles');
-                                          } else {
-                                            final tiposContrato = snapshot.data!;
-                                            return DropdownButtonFormField<int>(
-                                              value: _selectedTipoContratoId,
-                                              decoration: _dropdownDecoration('Tipo de Contrato'),
-                                              items: tiposContrato.map<DropdownMenuItem<int>>((tipo) {
-                                                return DropdownMenuItem<int>(
-                                                  value: tipo['tiCo_Id'],
-                                                  child: Text(tipo['tiCo_Descripcion']),
-                                                );
-                                              }).toList(),
-                                              onChanged: (value) {
-                                                setState(() {
-                                                  _selectedTipoContratoId = value;
-                                                });
-                                              },
-                                              validator: (value) => value == null ? 'Por favor seleccione un tipo de contrato' : null,
-                                            );
-                                          }
-                                        },
-                                      ),
                                       const SizedBox(height: 22),
                                       Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        mainAxisAlignment: MainAxisAlignment.end,
                                         children: [
-                                          _currentSection > 0
-                                              ? ElevatedButton.icon(
-                                                  onPressed: () => _goToSection(_currentSection - 1),
-                                                  icon: const Icon(Icons.arrow_back),
-                                                  label: const Text('Atrás'),
-                                                  style: ElevatedButton.styleFrom(
-                                                    backgroundColor: accentColor,
-                                                    foregroundColor: Colors.white,
-                                                    shape: RoundedRectangleBorder(
-                                                      borderRadius: BorderRadius.circular(8),
-                                                    ),
-                                                  ),
-                                                )
-                                              : const SizedBox.shrink(),
                                           ElevatedButton.icon(
                                             onPressed: () => _goToSection(1),
                                             icon: const Icon(Icons.arrow_forward),
@@ -496,174 +371,336 @@ class _PublicarPlazaScreenState extends State<PublicarPlazaScreen> {
                                 ),
                             ],
                           )
-                        : Column(
-                            key: const ValueKey(1),
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              _sectionStepper(1),
-                              Card(
-                                color: sectionBg,
-                                elevation: 4,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
-                                  child: Column(
-                                    children: [
-                                      _sectionTitle('Requisitos de la Plaza'),
-                                      const SizedBox(height: 8),
-                                      _styledTextField(
-                                        controller: _requDescripcionController,
-                                        hintText: 'Descripción del requisito',
-                                        fontSize: 15,
-                                        validator: (value) {
-                                          if (_currentSection == 1 && value != null && value.isEmpty) {
-                                            return 'Ingrese la descripción';
-                                          }
-                                          return null;
-                                        },
-                                      ),
-                                      const SizedBox(height: 10),
-                                      _styledTextField(
-                                        controller: _requInformacionController,
-                                        hintText: 'Información del requisito',
-                                        fontSize: 15,
-                                        validator: (value) {
-                                          if (_currentSection == 1 && value != null && value.isEmpty) {
-                                            return 'Ingrese la información';
-                                          }
-                                          return null;
-                                        },
-                                      ),
-                                      const SizedBox(height: 10),
-                                      SizedBox(
-                                        width: double.infinity,
-                                        child: ElevatedButton.icon(
-                                          onPressed: _addRequisito,
-                                          icon: const Icon(Icons.add),
-                                          label: const Text('Agregar Requisito'),
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: primaryColor,
-                                            foregroundColor: Colors.white,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(8),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 18),
-                                      if (_requisitos.isNotEmpty)
-                                        Card(
-                                          color: Colors.white,
-                                          elevation: 0,
-                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                          child: ListView.builder(
-                                            shrinkWrap: true,
-                                            physics: const NeverScrollableScrollPhysics(),
-                                            itemCount: _requisitos.length,
-                                            itemBuilder: (context, index) {
-                                              final req = _requisitos[index];
-                                              return ListTile(
-                                                title: Text(
-                                                  req['requ_Descripcion'] ?? '',
-                                                  style: const TextStyle(fontWeight: FontWeight.bold),
-                                                ),
-                                                subtitle: Text(req['requ_Informacion'] ?? ''),
-                                                trailing: IconButton(
-                                                  icon: const Icon(Icons.delete, color: Colors.red),
-                                                  onPressed: () => _removeRequisito(index),
-                                                ),
-                                              );
+                        // SECTION 2: Dirección y dropdowns
+                        : _currentSection == 1
+                            ? Column(
+                                key: const ValueKey(1),
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  _sectionStepper(1),
+                                  Card(
+                                    color: sectionBg,
+                                    elevation: 4,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                                        children: [
+                                          _sectionTitle('Dirección'),
+                                          _styledTextField(
+                                            controller: _direccionController,
+                                            hintText: 'Avenida X, Calle Y, Local Z',
+                                            fontSize: 15,
+                                            validator: (value) {
+                                              if (value == null || value.isEmpty) {
+                                                return 'Por favor ingrese la dirección';
+                                              }
+                                              return null;
                                             },
                                           ),
-                                        ),
-                                      if (_requisitos.isEmpty)
-                                        const Padding(
-                                          padding: EdgeInsets.symmetric(vertical: 12),
-                                          child: Text(
-                                            'Agrega al menos un requisito para la plaza.',
-                                            style: TextStyle(color: Colors.black54),
-                                            textAlign: TextAlign.center,
-                                          ),
-                                        ),
-                                      const SizedBox(height: 24),
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          ElevatedButton.icon(
-                                            onPressed: () => _goToSection(0),
-                                            icon: const Icon(Icons.arrow_back),
-                                            label: const Text('Atrás'),
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor: accentColor,
-                                              foregroundColor: Colors.white,
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(8),
-                                              ),
-                                            ),
-                                          ),
-                                          ElevatedButton.icon(
-                                            onPressed: _cargando
-                                                ? null
-                                                : () {
-                                                    if (_formKey.currentState!.validate() && _requisitos.isNotEmpty) {
-                                                      _publicarPlaza();
-                                                    } else {
-                                                      // Show toast with missing fields
-                                                      String missing = '';
-                                                      if (_selectedImage == null) missing += 'Imagen, ';
-                                                      if (_tituloController.text.trim().isEmpty) missing += 'Título, ';
-                                                      if (_informacionController.text.trim().isEmpty) missing += 'Información, ';
-                                                      if (_direccionController.text.trim().isEmpty) missing += 'Dirección, ';
-                                                      if (_selectedCargoId == null) missing += 'Cargo, ';
-                                                      if (_selectedCategoriaId == null) missing += 'Categoría, ';
-                                                      if (_selectedTipoContratoId == null) missing += 'Tipo de Contrato, ';
-                                                      if (_requisitos.isEmpty) missing += 'Al menos un requisito, ';
-                                                      if (missing.endsWith(', ')) missing = missing.substring(0, missing.length - 2);
-                                                      _showToast('Faltan campos: $missing');
-                                                    }
+                                          const SizedBox(height: 12),
+                                          _sectionTitle('Cargo'),
+                                          FutureBuilder<List<dynamic>>(
+                                            future: cargosList,
+                                            builder: (context, snapshot) {
+                                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                                return const LinearProgressIndicator();
+                                              } else if (snapshot.hasError) {
+                                                return Text('Error: ${snapshot.error}');
+                                              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                                                return const Text('No hay cargos disponibles');
+                                              } else {
+                                                final cargos = snapshot.data!;
+                                                return DropdownButtonFormField<int>(
+                                                  value: _selectedCargoId,
+                                                  decoration: _dropdownDecoration('Cargo'),
+                                                  items: cargos.map<DropdownMenuItem<int>>((cargo) {
+                                                    return DropdownMenuItem<int>(
+                                                      value: cargo['carg_Id'],
+                                                      child: Text(cargo['carg_Descripcion']),
+                                                    );
+                                                  }).toList(),
+                                                  onChanged: (value) {
+                                                    setState(() {
+                                                      _selectedCargoId = value;
+                                                    });
                                                   },
-                                            icon: const Icon(Icons.check),
-                                            label: _cargando
-                                                ? const SizedBox(
-                                                    height: 20,
-                                                    width: 20,
-                                                    child: CircularProgressIndicator(
-                                                      strokeWidth: 2,
-                                                      color: Colors.white,
-                                                    ),
-                                                  )
-                                                : const Text('Publicar'),
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor: primaryColor,
-                                              foregroundColor: Colors.white,
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(8),
+                                                  validator: (value) => value == null ? 'Por favor seleccione un cargo' : null,
+                                                );
+                                              }
+                                            },
+                                          ),
+                                          const SizedBox(height: 12),
+                                          _sectionTitle('Categoría'),
+                                          FutureBuilder<List<dynamic>>(
+                                            future: categoriasList,
+                                            builder: (context, snapshot) {
+                                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                                return const LinearProgressIndicator();
+                                              } else if (snapshot.hasError) {
+                                                return Text('Error: ${snapshot.error}');
+                                              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                                                return const Text('No hay categorías disponibles');
+                                              } else {
+                                                final categorias = snapshot.data!;
+                                                return DropdownButtonFormField<int>(
+                                                  value: _selectedCategoriaId,
+                                                  decoration: _dropdownDecoration('Categoría'),
+                                                  items: categorias.map<DropdownMenuItem<int>>((categoria) {
+                                                    return DropdownMenuItem<int>(
+                                                      value: categoria['cate_Id'],
+                                                      child: Text(categoria['cate_Descripcion']),
+                                                    );
+                                                  }).toList(),
+                                                  onChanged: (value) {
+                                                    setState(() {
+                                                      _selectedCategoriaId = value;
+                                                    });
+                                                  },
+                                                  validator: (value) => value == null ? 'Por favor seleccione una categoría' : null,
+                                                );
+                                              }
+                                            },
+                                          ),
+                                          const SizedBox(height: 12),
+                                          _sectionTitle('Tipo de Contrato'),
+                                          FutureBuilder<List<dynamic>>(
+                                            future: tiposContratoList,
+                                            builder: (context, snapshot) {
+                                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                                return const LinearProgressIndicator();
+                                              } else if (snapshot.hasError) {
+                                                return Text('Error: ${snapshot.error}');
+                                              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                                                return const Text('No hay tipos de contrato disponibles');
+                                              } else {
+                                                final tiposContrato = snapshot.data!;
+                                                return DropdownButtonFormField<int>(
+                                                  value: _selectedTipoContratoId,
+                                                  decoration: _dropdownDecoration('Tipo de Contrato'),
+                                                  items: tiposContrato.map<DropdownMenuItem<int>>((tipo) {
+                                                    return DropdownMenuItem<int>(
+                                                      value: tipo['tiCo_Id'],
+                                                      child: Text(tipo['tiCo_Descripcion']),
+                                                    );
+                                                  }).toList(),
+                                                  onChanged: (value) {
+                                                    setState(() {
+                                                      _selectedTipoContratoId = value;
+                                                    });
+                                                  },
+                                                  validator: (value) => value == null ? 'Por favor seleccione un tipo de contrato' : null,
+                                                );
+                                              }
+                                            },
+                                          ),
+                                          const SizedBox(height: 22),
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              ElevatedButton.icon(
+                                                onPressed: () => _goToSection(0),
+                                                icon: const Icon(Icons.arrow_back),
+                                                label: const Text('Atrás'),
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor: accentColor,
+                                                  foregroundColor: Colors.white,
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.circular(8),
+                                                  ),
+                                                ),
                                               ),
-                                            ),
+                                              ElevatedButton.icon(
+                                                onPressed: () => _goToSection(2),
+                                                icon: const Icon(Icons.arrow_forward),
+                                                label: const Text('Siguiente'),
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor: primaryColor,
+                                                  foregroundColor: Colors.white,
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.circular(8),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ],
                                       ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              if (_mensaje.isNotEmpty)
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 16),
-                                  child: Text(
-                                    _mensaje,
-                                    style: TextStyle(
-                                      color: _mensaje.contains('Bienvenido') || _mensaje.toLowerCase().contains('publicada')
-                                          ? Colors.green
-                                          : Colors.red,
-                                      fontSize: 14,
                                     ),
-                                    textAlign: TextAlign.center,
                                   ),
-                                ),
-                            ],
-                          ),
+                                ],
+                              )
+                            // SECTION 3: Requisitos
+                            : Column(
+                                key: const ValueKey(2),
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  _sectionStepper(2),
+                                  Card(
+                                    color: sectionBg,
+                                    elevation: 4,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+                                      child: Column(
+                                        children: [
+                                          _sectionTitle('Requisitos de la Plaza'),
+                                          const SizedBox(height: 8),
+                                          _styledTextField(
+                                            controller: _requDescripcionController,
+                                            hintText: 'Descripción del requisito',
+                                            fontSize: 15,
+                                            validator: (value) {
+                                              if (_currentSection == 2 && value != null && value.isEmpty) {
+                                                return 'Ingrese la descripción';
+                                              }
+                                              return null;
+                                            },
+                                          ),
+                                          const SizedBox(height: 10),
+                                          _styledTextField(
+                                            controller: _requInformacionController,
+                                            hintText: 'Información del requisito',
+                                            fontSize: 15,
+                                            validator: (value) {
+                                              if (_currentSection == 2 && value != null && value.isEmpty) {
+                                                return 'Ingrese la información';
+                                              }
+                                              return null;
+                                            },
+                                          ),
+                                          const SizedBox(height: 10),
+                                          SizedBox(
+                                            width: double.infinity,
+                                            child: ElevatedButton.icon(
+                                              onPressed: _addRequisito,
+                                              icon: const Icon(Icons.add),
+                                              label: const Text('Agregar Requisito'),
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: primaryColor,
+                                                foregroundColor: Colors.white,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(8),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 18),
+                                          if (_requisitos.isNotEmpty)
+                                            Card(
+                                              color: Colors.white,
+                                              elevation: 0,
+                                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                              child: ListView.builder(
+                                                shrinkWrap: true,
+                                                physics: const NeverScrollableScrollPhysics(),
+                                                itemCount: _requisitos.length,
+                                                itemBuilder: (context, index) {
+                                                  final req = _requisitos[index];
+                                                  return ListTile(
+                                                    title: Text(
+                                                      req['requ_Descripcion'] ?? '',
+                                                      style: const TextStyle(fontWeight: FontWeight.bold),
+                                                    ),
+                                                    subtitle: Text(req['requ_Informacion'] ?? ''),
+                                                    trailing: IconButton(
+                                                      icon: const Icon(Icons.delete, color: Colors.red),
+                                                      onPressed: () => _removeRequisito(index),
+                                                    ),
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                          if (_requisitos.isEmpty)
+                                            const Padding(
+                                              padding: EdgeInsets.symmetric(vertical: 12),
+                                              child: Text(
+                                                'Agrega al menos un requisito para la plaza.',
+                                                style: TextStyle(color: Colors.black54),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            ),
+                                          const SizedBox(height: 24),
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              ElevatedButton.icon(
+                                                onPressed: () => _goToSection(1),
+                                                icon: const Icon(Icons.arrow_back),
+                                                label: const Text('Atrás'),
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor: accentColor,
+                                                  foregroundColor: Colors.white,
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.circular(8),
+                                                  ),
+                                                ),
+                                              ),
+                                              ElevatedButton.icon(
+                                                onPressed: _cargando
+                                                    ? null
+                                                    : () {
+                                                        if (_formKey.currentState!.validate() && _requisitos.isNotEmpty) {
+                                                          _publicarPlaza();
+                                                        } else {
+                                                          // Show toast with missing fields
+                                                          String missing = '';
+                                                          if (_selectedImage == null) missing += 'Imagen, ';
+                                                          if (_tituloController.text.trim().isEmpty) missing += 'Título, ';
+                                                          if (_informacionController.text.trim().isEmpty) missing += 'Información, ';
+                                                          if (_direccionController.text.trim().isEmpty) missing += 'Dirección, ';
+                                                          if (_selectedCargoId == null) missing += 'Cargo, ';
+                                                          if (_selectedCategoriaId == null) missing += 'Categoría, ';
+                                                          if (_selectedTipoContratoId == null) missing += 'Tipo de Contrato, ';
+                                                          if (_requisitos.isEmpty) missing += 'Al menos un requisito, ';
+                                                          if (missing.endsWith(', ')) missing = missing.substring(0, missing.length - 2);
+                                                          _showToast('Faltan campos: $missing');
+                                                        }
+                                                      },
+                                                icon: const Icon(Icons.check),
+                                                label: _cargando
+                                                    ? const SizedBox(
+                                                        height: 20,
+                                                        width: 20,
+                                                        child: CircularProgressIndicator(
+                                                          strokeWidth: 2,
+                                                          color: Colors.white,
+                                                        ),
+                                                      )
+                                                    : const Text('Publicar'),
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor: primaryColor,
+                                                  foregroundColor: Colors.white,
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.circular(8),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  if (_mensaje.isNotEmpty)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 16),
+                                      child: Text(
+                                        _mensaje,
+                                        style: TextStyle(
+                                          color: _mensaje.contains('Bienvenido') || _mensaje.toLowerCase().contains('publicada')
+                                              ? Colors.green
+                                              : Colors.red,
+                                          fontSize: 14,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                ],
+                              ),
                   ),
                 ),
               ),
@@ -703,7 +740,7 @@ class _PublicarPlazaScreenState extends State<PublicarPlazaScreen> {
         decoration: InputDecoration(
           hintText: hintText,
           hintStyle: TextStyle(
-            color: Colors.grey.shade400, // More grayed out placeholder
+            color: Colors.grey.shade400,
             fontWeight: FontWeight.normal,
           ),
           fillColor: const Color(0xFFF5F5F7),
@@ -739,8 +776,6 @@ class _PublicarPlazaScreenState extends State<PublicarPlazaScreen> {
         ),
         filled: true,
         fillColor: const Color(0xFFF5F5F7),
-        
-        
       );
 
   // Section stepper indicator
@@ -758,12 +793,25 @@ class _PublicarPlazaScreenState extends State<PublicarPlazaScreen> {
               width: 38,
               height: 3,
               decoration: BoxDecoration(
-                color: section == 1 ? const Color(0xFFEE4D00) : Colors.grey.shade300,
+                color: section > 0 ? const Color(0xFFEE4D00) : Colors.grey.shade300,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
           ),
-          _stepCircle(1, section == 1, 'Requisitos'),
+          _stepCircle(1, section == 1, 'Dirección'),
+          Align(
+            alignment: Alignment.center,
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 6),
+              width: 38,
+              height: 3,
+              decoration: BoxDecoration(
+                color: section == 2 ? const Color(0xFFEE4D00) : Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
+          _stepCircle(2, section == 2, 'Requisitos'),
         ],
       ),
     );
