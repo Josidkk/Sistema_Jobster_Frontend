@@ -158,7 +158,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         const SizedBox(height: 8),
 
                         const Text(
-                          'Email',
+                          'Usuario',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 14,
@@ -169,9 +169,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
                         TextFormField(
                           controller: _usuarioController,
-                          keyboardType: TextInputType.emailAddress,
+                          keyboardType: TextInputType.text,
                           decoration: InputDecoration(
-                            hintText: 'nombre.usuario@gmail.com',
+                            hintText: 'Ejemplo: juan12',
+                            hintStyle: TextStyle(
+                              color: const Color.fromARGB(255, 158, 158, 158)
+                            ),
                             fillColor: Colors.white,
                             filled: true,
                             contentPadding: const EdgeInsets.symmetric(
@@ -220,7 +223,10 @@ class _LoginScreenState extends State<LoginScreen> {
                           controller: _contrasenaController,
                           obscureText: _obscureText,
                           decoration: InputDecoration(
-                            hintText: '••••••••••••',
+                            hintText: 'contraseña',
+                            hintStyle: TextStyle(
+                              color: const Color.fromARGB(255, 158, 158, 158)
+                            ),
                             fillColor: Colors.white,
                             filled: true,
                             contentPadding: const EdgeInsets.symmetric(
