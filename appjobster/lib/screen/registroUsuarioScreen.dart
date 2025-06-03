@@ -19,18 +19,15 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
   final _plazaService = PlazaService();
   // Controllers for usuario info
   final TextEditingController _usuaNombreController = TextEditingController();
-  final TextEditingController _usuaContrasenaController =
-      TextEditingController();
+  final TextEditingController _usuaContrasenaController = TextEditingController();
   final TextEditingController _correoController = TextEditingController();
 
   // Controllers for persona info
   final TextEditingController _persDNIController = TextEditingController();
   final TextEditingController _persNombresController = TextEditingController();
-  final TextEditingController _persApellidosController =
-      TextEditingController();
+  final TextEditingController _persApellidosController = TextEditingController();
   final TextEditingController _persTelefonoController = TextEditingController();
-  final TextEditingController _persDireccionController =
-      TextEditingController();
+  final TextEditingController _persDireccionController = TextEditingController();
 
   // Image for usuario
   File? _selectedUsuaImagen;
@@ -39,6 +36,9 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
   int? _selectedEstadoCivilId;
   String? _selectedMunicipioId;
   String? _persSexo; // 'M' or 'F'
+  
+  // Rol del usuario (Nuevo)
+  int _selectedRol = 3; // Por defecto, Buscador de trabajo (3)
 
   // Lists for dropdowns (replace with your service/future if needed)
   late final Future<List<dynamic>> estadosCivilesList;
@@ -47,11 +47,9 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _cargando = false;
   String _mensaje = '';
-
+  
   // Stepper control
   int _currentStep = 0;
-  int?
-  _selectedRole; // Para almacenar el rol seleccionado (publicador o buscador)
 
   @override
   void initState() {
@@ -96,14 +94,10 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
       }
 
       // 2. Upload image to Cloudinary
-      final url = Uri.parse(
-        'https://api.cloudinary.com/v1_1/dw2aj3hcu/image/upload',
-      );
+      final url = Uri.parse('https://api.cloudinary.com/v1_1/dw2aj3hcu/image/upload');
       final request = http.MultipartRequest('POST', url)
         ..fields['upload_preset'] = 'unsignedig'
-        ..files.add(
-          await http.MultipartFile.fromPath('file', _selectedUsuaImagen!.path),
-        );
+        ..files.add(await http.MultipartFile.fromPath('file', _selectedUsuaImagen!.path));
 
       final response = await request.send();
 
@@ -126,12 +120,15 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
           _persDireccionController.text.trim(),
           _selectedEstadoCivilId,
           _selectedMunicipioId,
-          _selectedRole,
+          _selectedRol // Ahora usa el rol seleccionado (3 o 4)
         );
 
         if (respuesta.toString().toLowerCase().contains('creada')) {
           setState(() {
-            NavigationService.navigateWithSlide(context, const LoginScreen());
+            NavigationService.navigateWithSlide(
+              context,
+              const LoginScreen(),
+            );
 
             _mensaje = 'Usuario Registrado con éxito';
           });
@@ -176,73 +173,10 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
   }
 
   // Método para continuar al siguiente paso
-  bool _validateCurrentStep() {
-    switch (_currentStep) {
-      case 0:
-        if (_selectedRole == null) {
-          setState(() => _mensaje = 'Por favor seleccione un rol');
-          return false;
-        }
-        break;
-      case 1: // Datos de la cuenta
-        if (_usuaNombreController.text.trim().isEmpty) {
-          setState(() => _mensaje = 'Por favor ingrese un nombre de usuario');
-          return false;
-        }
-        if (_usuaContrasenaController.text.trim().isEmpty) {
-          setState(() => _mensaje = 'Por favor ingrese una contraseña');
-          return false;
-        }
-        if (_correoController.text.trim().isEmpty) {
-          setState(() => _mensaje = 'Por favor ingrese un correo');
-          return false;
-        }
-        break;
-      case 2: // Datos personales
-        if (_persDNIController.text.trim().isEmpty) {
-          setState(() => _mensaje = 'Por favor ingrese su DNI');
-          return false;
-        }
-        if (_persNombresController.text.trim().isEmpty) {
-          setState(() => _mensaje = 'Por favor ingrese sus nombres');
-          return false;
-        }
-        if (_persApellidosController.text.trim().isEmpty) {
-          setState(() => _mensaje = 'Por favor ingrese sus apellidos');
-          return false;
-        }
-        if (_persTelefonoController.text.trim().isEmpty) {
-          setState(() => _mensaje = 'Por favor ingrese su teléfono');
-          return false;
-        }
-        if (_persSexo == null) {
-          setState(() => _mensaje = 'Por favor seleccione su sexo');
-          return false;
-        }
-        if (_persDireccionController.text.trim().isEmpty) {
-          setState(() => _mensaje = 'Por favor ingrese su dirección');
-          return false;
-        }
-        if (_selectedEstadoCivilId == null) {
-          setState(() => _mensaje = 'Por favor seleccione su estado civil');
-          return false;
-        }
-        if (_selectedMunicipioId == null) {
-          setState(() => _mensaje = 'Por favor seleccione su municipio');
-          return false;
-        }
-        break;
-    }
-    setState(() => _mensaje = ''); // Limpiar mensaje de error
-    return true;
-  }
-
   void _nextStep() {
-    if (!_validateCurrentStep()) return;
-    
-    if (_currentStep < 3) {
+    if (_currentStep < 3) { // Ahora hay 4 pasos en total (0-3)
       setState(() {
-        _currentStep++;
+        _currentStep += 1;
       });
     } else {
       _registrarUsuario();
@@ -263,15 +197,14 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
     const Color primaryColor = Color(0xFFFF6B00);
 
     return Scaffold(
-      appBar: AppBar(
+     appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.of(context).pop(),
         ),
-      ),
-      extendBodyBehindAppBar: true,
+      ),extendBodyBehindAppBar: true,
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
@@ -283,7 +216,7 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
           child: Column(
             children: [
               const SizedBox(height: 5),
-
+            
               const Text(
                 'Registrate',
                 style: TextStyle(
@@ -294,7 +227,7 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
                 textAlign: TextAlign.left,
               ),
               const SizedBox(height: 12),
-
+              
               // Stepper indicator
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -304,15 +237,15 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
                     _buildStepperLine(),
                     _buildStepperDot(1, 'Cuenta'),
                     _buildStepperLine(),
-                    _buildStepperDot(2, 'Datos'),
+                    _buildStepperDot(2, 'Personal'),
                     _buildStepperLine(),
-                    _buildStepperDot(3, 'Imagen'),
+                    _buildStepperDot(3, 'Contacto'),
                   ],
                 ),
               ),
-
+              
               const SizedBox(height: 16),
-
+              
               // Content based on current step
               Expanded(
                 child: SingleChildScrollView(
@@ -321,12 +254,7 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
                     child: Form(
                       key: _formKey,
                       child: Card(
-                        color: const Color.fromARGB(
-                          255,
-                          255,
-                          232,
-                          223,
-                        ).withOpacity(0.85),
+                        color: const Color.fromARGB(255, 255, 232, 223).withOpacity(0.85),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
                         ),
@@ -337,20 +265,20 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               // Mostrar contenido según el paso actual
-                              _currentStep == 0
-                                  ? _buildRoleSelectionContent()
-                                  : _currentStep == 1
-                                  ? _buildStep1Content()
-                                  : _currentStep == 2
-                                  ? _buildStep2Content()
-                                  : _buildStep3Content(),
-
+                              if (_currentStep == 0)
+                                _buildStep0Content(), // Nuevo paso para selección de rol
+                              if (_currentStep == 1)
+                                _buildStep1Content(),
+                              if (_currentStep == 2)
+                                _buildStep2Content(),
+                              if (_currentStep == 3)
+                                _buildStep3Content(),
+                                
                               const SizedBox(height: 20),
-
+                              
                               // Navigation buttons
                               Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   if (_currentStep > 0)
                                     ElevatedButton(
@@ -363,7 +291,7 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
                                     )
                                   else
                                     const SizedBox(),
-
+                                  
                                   ElevatedButton(
                                     onPressed: _cargando ? null : _nextStep,
                                     style: ElevatedButton.styleFrom(
@@ -379,15 +307,11 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
                                               color: Colors.white,
                                             ),
                                           )
-                                        : Text(
-                                            _currentStep == 3
-                                                ? 'Registrarse'
-                                                : 'Siguiente',
-                                          ),
+                                        : Text(_currentStep == 3 ? 'Registrarse' : 'Siguiente'),
                                   ),
                                 ],
                               ),
-
+                              
                               if (_mensaje.isNotEmpty)
                                 Padding(
                                   padding: const EdgeInsets.only(top: 16),
@@ -416,94 +340,8 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
       ),
     );
   }
-
+  
   // Métodos para construir los componentes del stepper
-  // Contenido del paso de selección de rol
-  Widget _buildRoleSelectionContent() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        const SizedBox(height: 40),
-        const Text(
-          '¿Qué tipo de usuario eres?',
-          style: TextStyle(
-            color: Color(0xFFFF6B00),
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 40),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            _buildRoleButton(
-              'Publicador',
-              Icons.business_center,
-              _selectedRole == 4,
-              () => setState(() => _selectedRole = 4),
-            ),
-            _buildRoleButton(
-              'Buscador',
-              Icons.search,
-              _selectedRole == 3,
-              () => setState(() => _selectedRole = 3),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildRoleButton(
-    String text,
-    IconData icon,
-    bool isSelected,
-    VoidCallback onTap,
-  ) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 140,
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFFF6B00) : Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFFFF6B00), width: 2),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: const Color(0xFFFF6B00).withOpacity(0.3),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
-                ]
-              : null,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              size: 48,
-              color: isSelected ? Colors.white : const Color(0xFFFF6B00),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              text,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: isSelected ? Colors.white : const Color(0xFFFF6B00),
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildStepperDot(int step, String label) {
     bool isActive = _currentStep >= step;
     return Expanded(
@@ -519,10 +357,7 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
             child: Center(
               child: Text(
                 (step + 1).toString(),
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
               ),
             ),
           ),
@@ -538,11 +373,145 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
       ),
     );
   }
-
+  
   Widget _buildStepperLine() {
-    return const Expanded(child: Divider(color: Colors.grey, thickness: 2));
+    return const Expanded(
+      child: Divider(
+        color: Colors.grey,
+        thickness: 2,
+      ),
+    );
   }
-
+  
+  // Contenido del paso inicial - Selección de rol
+  Widget _buildStep0Content() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const Text(
+          '¿Qué rol tendrás en Jobster?',
+          style: TextStyle(
+            color: Color(0xFFFF6B00),
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 30),
+        
+        // Botón para Buscador de trabajo
+        GestureDetector(
+          onTap: () {
+            setState(() {
+              _selectedRol = 3; // Código para Buscador de trabajo
+            });
+          },
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: _selectedRol == 3 
+                ? const Color(0xFFFF6B00).withOpacity(0.2) 
+                : Colors.white,
+              borderRadius: BorderRadius.circular(15),
+              border: Border.all(
+                color: _selectedRol == 3 
+                  ? const Color(0xFFFF6B00) 
+                  : Colors.grey.shade300,
+                width: 2,
+              ),
+            ),
+            child: Column(
+              children: [
+                Icon(
+                  Icons.search_outlined,
+                  size: 60,
+                  color: _selectedRol == 3 
+                    ? const Color(0xFFFF6B00) 
+                    : Colors.grey,
+                ),
+                const SizedBox(height: 15),
+                Text(
+                  'Buscador de Trabajo',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: _selectedRol == 3 
+                      ? const Color(0xFFFF6B00) 
+                      : Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  'Encontrarás oportunidades laborales según tus habilidades',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.black54,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        
+        const SizedBox(height: 20),
+        
+        // Botón para Publicador de trabajo
+        GestureDetector(
+          onTap: () {
+            setState(() {
+              _selectedRol = 4; // Código para Publicador de trabajo
+            });
+          },
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: _selectedRol == 4 
+                ? const Color(0xFFFF6B00).withOpacity(0.2) 
+                : Colors.white,
+              borderRadius: BorderRadius.circular(15),
+              border: Border.all(
+                color: _selectedRol == 4 
+                  ? const Color(0xFFFF6B00) 
+                  : Colors.grey.shade300,
+                width: 2,
+              ),
+            ),
+            child: Column(
+              children: [
+                Icon(
+                  Icons.business_center_outlined,
+                  size: 60,
+                  color: _selectedRol == 4 
+                    ? const Color(0xFFFF6B00) 
+                    : Colors.grey,
+                ),
+                const SizedBox(height: 15),
+                Text(
+                  'Publicador de Trabajo',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: _selectedRol == 4 
+                      ? const Color(0xFFFF6B00) 
+                      : Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  'Podrás crear ofertas de trabajo y encontrar candidatos',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.black54,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+  
   // Contenido del primer paso - Información de cuenta
   Widget _buildStep1Content() {
     return Column(
@@ -577,10 +546,7 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
                       height: 120,
                       width: 120,
                       color: Colors.white,
-                      child: const Icon(
-                        Icons.add_photo_alternate_outlined,
-                        size: 40,
-                      ),
+                      child: const Icon(Icons.add_photo_alternate_outlined, size: 40),
                     )
                   : Image.file(
                       _selectedUsuaImagen!,
@@ -659,7 +625,7 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
       ],
     );
   }
-
+  
   // Contenido del segundo paso - Información personal
   Widget _buildStep2Content() {
     return Column(
@@ -748,7 +714,10 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
         ),
         const SizedBox(height: 4),
         ToggleButtons(
-          isSelected: [_persSexo == 'M', _persSexo == 'F'],
+          isSelected: [
+            _persSexo == 'M',
+            _persSexo == 'F',
+          ],
           onPressed: (index) {
             setState(() {
               _persSexo = index == 0 ? 'M' : 'F';
@@ -756,8 +725,8 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
           },
           borderRadius: BorderRadius.circular(8),
           selectedColor: Colors.white,
-          fillColor: _persSexo == 'M'
-              ? const Color.fromARGB(255, 38, 107, 255)
+          fillColor: _persSexo == 'M' 
+              ? const Color.fromARGB(255, 38, 107, 255) 
               : const Color.fromARGB(255, 255, 38, 161),
           color: Colors.black87,
           constraints: const BoxConstraints(minHeight: 40, minWidth: 165),
@@ -765,13 +734,23 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
             Column(
               children: [
                 SizedBox(height: 10),
-                Row(children: [Icon(Icons.man_sharp), Text('Masculino')]),
+                Row(
+                  children: [
+                    Icon(Icons.man_sharp),
+                    Text('Masculino')
+                  ],
+                )
               ],
             ),
             Column(
               children: [
                 SizedBox(height: 10),
-                Row(children: [Icon(Icons.woman_sharp), Text('Femenino')]),
+                Row(
+                  children: [
+                    Icon(Icons.woman_sharp),
+                    Text('Femenino')
+                  ],
+                )
               ],
             ),
           ],
@@ -779,7 +758,7 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
       ],
     );
   }
-
+  
   // Contenido del tercer paso - Información de contacto
   Widget _buildStep3Content() {
     return Column(

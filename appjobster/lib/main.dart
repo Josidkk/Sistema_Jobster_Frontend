@@ -92,8 +92,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       );
     }
     
-    // Añadir la pestaña de Dashboard
-    tabs.add(
+
+
+  
+if (Session.tieneAccesoAPantalla('Dashboard') || Session.tieneAccesoAPantalla('ADMIN')) 
+   tabs.add(
       _TabConfig(
         icon: Icons.dashboard,
         label: 'Dashboard',
@@ -101,6 +104,25 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       ),
     );
 
+if (Session.tieneAccesoAPantalla('Guardados') || Session.tieneAccesoAPantalla('ADMIN')) 
+      tabs.add(
+      _TabConfig(
+        icon: Icons.save,
+        label: 'Guardados',
+        page: const VerGuardadosScreen(),
+      ),
+    );
+
+if (Session.tieneAccesoAPantalla('Solicitudes') || Session.tieneAccesoAPantalla('ADMIN')) 
+      tabs.add(
+      _TabConfig(
+        icon: Icons.assignment,
+        label: 'Solicitudes',
+        page: const VerPlazasSolicitadasScreen(),
+      ),
+    );
+
+if (Session.tieneAccesoAPantalla('Perfil') || Session.tieneAccesoAPantalla('ADMIN')) 
     tabs.add(
       _TabConfig(
         icon: Icons.person,

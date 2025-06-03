@@ -7,11 +7,16 @@ class Session {
   static List<String> pantallasDisponibles = [];
 
   static bool get isLoggedIn => usua_Id != null;
+ static bool EsAdmin = false; // Variable para verificar si es administrador
 
   static String? plaza_Id;
 
   static void login(String id) {
     usua_Id = id;
+  }
+
+  static void EsAdminT(bool id) {
+    EsAdmin = true;
   }
 
   static void id(int? id) {

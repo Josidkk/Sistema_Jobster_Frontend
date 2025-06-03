@@ -67,6 +67,7 @@ class _LoginScreenState extends State<LoginScreen> {
           try {
             Session.login(usuario.usua_Nombre);
             Session.id(usuario.usua_Id);
+          
           } catch (e) {}
 
          NavigationService.navigateWithFade(
