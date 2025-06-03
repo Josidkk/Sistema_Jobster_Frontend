@@ -3,6 +3,8 @@ import 'package:jobster/screen/principalPlazasScreen.dart';
 import 'screen/pre-login.dart';
 import 'screen/publicarPlazaScreen.dart';
 import 'screen/perfilScreen.dart';
+import 'screen/listarAprobadosScreen.dart';
+import 'screen/dashboardScreen.dart';
 import 'services/navigation_service.dart';
 import 'services/Session.dart';
 
@@ -37,57 +39,82 @@ class MainNavigationScreen extends StatefulWidget {
 
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _selectedIndex = 0;
-  bool tieneAccesoPublicar = false;
-
-  final List<Widget> _pages = [
-    const PrincipalPlazasScreen(),
-    // const Center(child: Text('Inicio')),
-    const PublicarPlazaScreen(),
-    const PerfilScreen(),
-  ];
 
   @override
   void initState() {
     super.initState();
-    // Verificar acceso al iniciar la pantalla
     _verificarAcceso();
   }
 
   Future<void> _verificarAcceso() async {
     if (Session.isLoggedIn && Session.usuario_id != null) {
       await Session.obtenerPantallasDisponibles(Session.usuario_id);
-      setState(() {
-        tieneAccesoPublicar = Session.tieneAccesoAPantalla('Publicar');
-      });
+      setState(() {});
     }
+  }
+
+  // Genera las pestañas disponibles según los permisos
+  List<_TabConfig> get _availableTabs {
+    List<_TabConfig> tabs = [
+      _TabConfig(
+        icon: Icons.home,
+        label: 'Inicio',
+        page: const PrincipalPlazasScreen(),
+      ),
+    ];
+
+    if (Session.tieneAccesoAPantalla('Publicar')) {
+      tabs.add(
+        _TabConfig(
+          icon: Icons.control_point,
+          label: 'Publicar',
+          page: const PublicarPlazaScreen(),
+        ),
+      );
+    }
+
+    if (Session.tieneAccesoAPantalla('Aprobaciones')) {
+      tabs.add(
+        _TabConfig(
+          icon: Icons.check_circle,
+          label: 'Aprobaciones',
+          page: const ListarAprobadosScreen(),
+        ),
+      );
+    }
+    
+    // Añadir la pestaña de Dashboard
+    tabs.add(
+      _TabConfig(
+        icon: Icons.dashboard,
+        label: 'Dashboard',
+        page: const DashboardScreen(),
+      ),
+    );
+
+    tabs.add(
+      _TabConfig(
+        icon: Icons.person,
+        label: 'Perfil',
+        page: const PerfilScreen(),
+      ),
+    );
+
+    return tabs;
   }
 
   @override
   Widget build(BuildContext context) {
-    // Calculamos los elementos disponibles para la barra de navegación
-    final navItems = [
-      const BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Inicio'),
-      if (tieneAccesoPublicar)
-        const BottomNavigationBarItem(
-            icon: Icon(Icons.control_point, size: 35), label: 'Publicar'),
-      const BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
-    ];
+    final tabs = _availableTabs;
 
-    // Aseguramos que el índice seleccionado sea válido
-    if (_selectedIndex >= navItems.length) {
-      _selectedIndex = navItems.length - 1;
-    }
-
-    // Calculamos qué página mostrar basado en los elementos disponibles
-    int pageIndex = _selectedIndex;
-    if (!tieneAccesoPublicar && _selectedIndex >= 1) {
-      // Si no tiene acceso a publicar y el índice es 1 o más, usar índice 2
-      pageIndex = _selectedIndex + 1;
+    // Asegura que el índice seleccionado sea válido
+    if (_selectedIndex >= tabs.length) {
+      _selectedIndex = 0;
     }
 
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false, // Esto elimina el botón de regreso
+        automaticallyImplyLeading: false,
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -111,16 +138,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             icon: const Icon(Icons.exit_to_app),
             color: Colors.white,
             onPressed: () {
-              NavigationService.navigateWithFade(
-                context,
-                const prelogin(),
-              );
-
-              // Otra opción sería usando pushReplacement para salir completamente
-              // Navigator.pushReplacement(
-              //   context,
-              //   MaterialPageRoute(builder: (context) => prelogin()),
-              // );
+              NavigationService.navigateWithFade(context, const prelogin());
             },
           ),
         ],
@@ -130,22 +148,34 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         transitionBuilder: (Widget child, Animation<double> animation) {
           return FadeTransition(opacity: animation, child: child);
         },
-        // Usamos pageIndex para acceder a _pages
-        child: pageIndex < _pages.length ? _pages[pageIndex] : _pages[0],
+        child: tabs[_selectedIndex].page,
       ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: _selectedIndex,
         selectedItemColor: const Color.fromARGB(255, 255, 107, 0),
-        onTap: _onItemTapped,
-        items: navItems,
+        onTap: (index) => setState(() => _selectedIndex = index),
+        items: tabs
+            .map(
+              (tab) => BottomNavigationBarItem(
+                icon: Icon(
+                  tab.icon,
+                  size: tab.icon == Icons.control_point ? 35 : 24,
+                ),
+                label: tab.label,
+              ),
+            )
+            .toList(),
       ),
     );
   }
+}
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
+// Clase helper para configurar cada pestaña
+class _TabConfig {
+  final IconData icon;
+  final String label;
+  final Widget page;
+
+  _TabConfig({required this.icon, required this.label, required this.page});
 }
