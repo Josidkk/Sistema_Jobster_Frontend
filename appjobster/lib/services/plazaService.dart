@@ -91,7 +91,7 @@ class PlazaService {
         "plaz_Imagen": imagen,
         "muni_Codigo": "0501", //duro
         "cate_Id": cate,
-        "usua_Id": 1, //duro
+        "usua_Id": Session.usuario_id, //duro
         "carg_Id": carg,
         "tiCo_Id": tico,
         "plaz_Estado": true,

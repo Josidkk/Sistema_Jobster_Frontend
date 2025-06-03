@@ -18,14 +18,14 @@ import 'dart:convert';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
-class PrincipalPlazasScreen extends StatefulWidget {
-  const PrincipalPlazasScreen({super.key});
+class MisPlazasScreen extends StatefulWidget {
+  const MisPlazasScreen({super.key});
 
   @override
-  State<PrincipalPlazasScreen> createState() => _PrincipalPlazasScreenState();
+  State<MisPlazasScreen> createState() => _MisPlazasScreenState();
 }
 
-class _PrincipalPlazasScreenState extends State<PrincipalPlazasScreen> {
+class _MisPlazasScreenState extends State<MisPlazasScreen> {
   final _plazaService = PlazaService();
 
   final TextEditingController _usuarioController = TextEditingController();
@@ -369,9 +369,11 @@ class _PrincipalPlazasScreenState extends State<PrincipalPlazasScreen> {
                               return Text('No hay plazas');
                             } else {
                               final plazas = snapshot.data!;
+
+                              final plazasUsuario = plazas.where((plaza) => plaza['usua_Id'] == Session.usuario_id).toList();
                               
                               return Column(
-                                children: plazas.map((plaza) => 
+                                children: plazasUsuario.map((plaza) => 
                                 
                                 // Row(
                                 //   children: [
