@@ -97,7 +97,19 @@ class PlazaService {
         "usua_Creacion": 1,
         "plaz_FechaCreacion": "2025-05-26T18:57:39.545Z",
         "usua_Modificacion": 0,
-        "plaz_FechaModificacion": "2025-05-26T18:57:39.545Z"
+        "plaz_FechaModificacion": "2025-05-26T18:57:39.545Z",
+
+          "muni_Descripcion": "string",
+  "depa_Descripcion": "string",
+  "cate_Descripcion": "string",
+  "usua_Nombre": "string",
+  "usua_Correo": "string",
+  "usua_Imagen": "string",
+  "pers_Telefono": "string",
+  "pers_Nombres": "string",
+  "pers_Apellidos": "string",
+  "carg_Descripcion": "string",
+  "tiCo_Descripcion": "string"
     };
 
     developer.log('Login Request URL: $url');
@@ -584,6 +596,17 @@ class PlazaService {
       "plaz_FechaCreacion": "2025-05-30T18:40:05.381Z",
       "usua_Modificacion": 0,
       "plaz_FechaModificacion": "2025-05-30T18:40:05.381Z",
+        "muni_Descripcion": "string",
+        "depa_Descripcion": "string",
+        "cate_Descripcion": "string",
+        "usua_Nombre": "string",
+        "usua_Correo": "string",
+        "usua_Imagen": "string",
+        "pers_Telefono": "string",
+        "pers_Nombres": "string",
+        "pers_Apellidos": "string",
+        "carg_Descripcion": "string",
+        "tiCo_Descripcion": "string"
     };
 
     final url = Uri.parse('http://$apiServer/api/Plazas/BuscarPlaza');
