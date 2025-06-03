@@ -36,6 +36,9 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
   int? _selectedEstadoCivilId;
   String? _selectedMunicipioId;
   String? _persSexo; // 'M' or 'F'
+  
+  // Rol del usuario (Nuevo)
+  int _selectedRol = 3; // Por defecto, Buscador de trabajo (3)
 
   // Lists for dropdowns (replace with your service/future if needed)
   late final Future<List<dynamic>> estadosCivilesList;
@@ -116,7 +119,8 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
           _persSexo,
           _persDireccionController.text.trim(),
           _selectedEstadoCivilId,
-          _selectedMunicipioId
+          _selectedMunicipioId,
+          _selectedRol // Ahora usa el rol seleccionado (3 o 4)
         );
 
         if (respuesta.toString().toLowerCase().contains('creada')) {
@@ -170,7 +174,7 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
 
   // Método para continuar al siguiente paso
   void _nextStep() {
-    if (_currentStep < 2) {
+    if (_currentStep < 3) { // Ahora hay 4 pasos en total (0-3)
       setState(() {
         _currentStep += 1;
       });
@@ -229,11 +233,13 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Row(
                   children: [
-                    _buildStepperDot(0, 'Cuenta'),
+                    _buildStepperDot(0, 'Rol'),
                     _buildStepperLine(),
-                    _buildStepperDot(1, 'Personal'),
+                    _buildStepperDot(1, 'Cuenta'),
                     _buildStepperLine(),
-                    _buildStepperDot(2, 'Contacto'),
+                    _buildStepperDot(2, 'Personal'),
+                    _buildStepperLine(),
+                    _buildStepperDot(3, 'Contacto'),
                   ],
                 ),
               ),
@@ -260,10 +266,12 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
                             children: [
                               // Mostrar contenido según el paso actual
                               if (_currentStep == 0)
-                                _buildStep1Content(),
+                                _buildStep0Content(), // Nuevo paso para selección de rol
                               if (_currentStep == 1)
-                                _buildStep2Content(),
+                                _buildStep1Content(),
                               if (_currentStep == 2)
+                                _buildStep2Content(),
+                              if (_currentStep == 3)
                                 _buildStep3Content(),
                                 
                               const SizedBox(height: 20),
@@ -299,7 +307,7 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
                                               color: Colors.white,
                                             ),
                                           )
-                                        : Text(_currentStep == 2 ? 'Registrarse' : 'Siguiente'),
+                                        : Text(_currentStep == 3 ? 'Registrarse' : 'Siguiente'),
                                   ),
                                 ],
                               ),
@@ -372,6 +380,135 @@ class _RegistroUsuarioScreenState extends State<RegistroUsuarioScreen> {
         color: Colors.grey,
         thickness: 2,
       ),
+    );
+  }
+  
+  // Contenido del paso inicial - Selección de rol
+  Widget _buildStep0Content() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const Text(
+          '¿Qué rol tendrás en Jobster?',
+          style: TextStyle(
+            color: Color(0xFFFF6B00),
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 30),
+        
+        // Botón para Buscador de trabajo
+        GestureDetector(
+          onTap: () {
+            setState(() {
+              _selectedRol = 3; // Código para Buscador de trabajo
+            });
+          },
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: _selectedRol == 3 
+                ? const Color(0xFFFF6B00).withOpacity(0.2) 
+                : Colors.white,
+              borderRadius: BorderRadius.circular(15),
+              border: Border.all(
+                color: _selectedRol == 3 
+                  ? const Color(0xFFFF6B00) 
+                  : Colors.grey.shade300,
+                width: 2,
+              ),
+            ),
+            child: Column(
+              children: [
+                Icon(
+                  Icons.search_outlined,
+                  size: 60,
+                  color: _selectedRol == 3 
+                    ? const Color(0xFFFF6B00) 
+                    : Colors.grey,
+                ),
+                const SizedBox(height: 15),
+                Text(
+                  'Buscador de Trabajo',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: _selectedRol == 3 
+                      ? const Color(0xFFFF6B00) 
+                      : Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  'Encontrarás oportunidades laborales según tus habilidades',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.black54,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        
+        const SizedBox(height: 20),
+        
+        // Botón para Publicador de trabajo
+        GestureDetector(
+          onTap: () {
+            setState(() {
+              _selectedRol = 4; // Código para Publicador de trabajo
+            });
+          },
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: _selectedRol == 4 
+                ? const Color(0xFFFF6B00).withOpacity(0.2) 
+                : Colors.white,
+              borderRadius: BorderRadius.circular(15),
+              border: Border.all(
+                color: _selectedRol == 4 
+                  ? const Color(0xFFFF6B00) 
+                  : Colors.grey.shade300,
+                width: 2,
+              ),
+            ),
+            child: Column(
+              children: [
+                Icon(
+                  Icons.business_center_outlined,
+                  size: 60,
+                  color: _selectedRol == 4 
+                    ? const Color(0xFFFF6B00) 
+                    : Colors.grey,
+                ),
+                const SizedBox(height: 15),
+                Text(
+                  'Publicador de Trabajo',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: _selectedRol == 4 
+                      ? const Color(0xFFFF6B00) 
+                      : Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  'Podrás crear ofertas de trabajo y encontrar candidatos',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.black54,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
   

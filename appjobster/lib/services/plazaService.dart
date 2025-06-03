@@ -6,15 +6,14 @@ import 'package:http/http.dart' as http;
 import 'package:jobster/services/Session.dart';
 import '../models/usuarioViewModel.dart';
 import '../services/globalService.dart';
+import '../screen/registroUsuarioScreen.dart';
 
 class PlazaService {
-
   static const String _baseUrl = 'http://$apiServer/api/Usuarios/IniciarSesion';
   static const String _apikey =
       'heBJ6u4RtETi9xjC5dICVbmh023nX0sIFrQbMHd9FKiyPBP4QyQe0oW1cYoyFFbwvbeoTP7X4hMxyv6RsMKUMEdVkT3lCHhC80mQirqPUUOW95FFnPedtVw4u3Wj53cf';
 
   Future<Usuario?> login(String usuario, String contra) async {
-
     final url = Uri.parse(_baseUrl);
 
     // Using the exact format from the cURL example
@@ -153,7 +152,6 @@ class PlazaService {
         );
         
         return 'creada';
-
       } else {
         throw Exception(
           'Error en la solicitud: Código ${response.statusCode}, Respuesta: ${response.body}',
@@ -165,186 +163,160 @@ class PlazaService {
     }
   }
 
-
-
-  Future<List<dynamic>> getMunicipios() async{
-
+  Future<List<dynamic>> getMunicipios() async {
     final url = Uri.parse('http://$apiServer/api/Generales/ListarMunicipios');
     developer.log('Get Municipios Request URL: $url');
 
     try {
+      final response = await http.get(
+        url,
+        headers: {'Content-Type': 'application/json', 'X-Api-Key': _apikey},
+      );
 
-        final response = await http.get(
-          url,
-          headers: {'Content-Type': 'application/json', 'X-Api-Key': _apikey},
+      developer.log('Get Municipios Response Status: ${response.statusCode}');
+      developer.log('Get Municipios Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> objeto = jsonDecode(response.body);
+        final List<dynamic> municipiosList = objeto['data'] as List<dynamic>;
+
+        print('object');
+        print(municipiosList);
+
+        // final List<dynamic> municipiosList = jsonDecode(response.body);
+        return municipiosList;
+      } else {
+        throw Exception(
+          'Error en la solicitud: Código ${response.statusCode}, Respuesta: ${response.body}',
         );
-
-        developer.log('Get Municipios Response Status: ${response.statusCode}');
-        developer.log('Get Municipios Response Body: ${response.body}');
-
-        if (response.statusCode == 200) {
-
-          
-          final Map<String,dynamic > objeto = jsonDecode(response.body);
-          final List<dynamic> municipiosList = objeto['data'] as List<dynamic>;
-
-          print('object');
-          print(municipiosList);
-
-          // final List<dynamic> municipiosList = jsonDecode(response.body);
-          return municipiosList;
-
-        } else {
-          throw Exception(
-            'Error en la solicitud: Código ${response.statusCode}, Respuesta: ${response.body}',
-          );
-        }
-      } catch (e) {
-        developer.log('Get Municipios Error: $e');
-        throw Exception('Error en la solicitud: $e');
       }
-    } 
+    } catch (e) {
+      developer.log('Get Municipios Error: $e');
+      throw Exception('Error en la solicitud: $e');
+    }
+  }
   // listarmunicipios
-  
 
-  Future<List<dynamic>> getEstadosCiviles() async{
-
-    final url = Uri.parse('http://$apiServer/api/Generales/ListarEstadosCiviles');
+  Future<List<dynamic>> getEstadosCiviles() async {
+    final url = Uri.parse(
+      'http://$apiServer/api/Generales/ListarEstadosCiviles',
+    );
     developer.log('Get Municipios Request URL: $url');
 
     try {
+      final response = await http.get(
+        url,
+        headers: {'Content-Type': 'application/json', 'X-Api-Key': _apikey},
+      );
 
-        final response = await http.get(
-          url,
-          headers: {'Content-Type': 'application/json', 'X-Api-Key': _apikey},
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> objeto = jsonDecode(response.body);
+        final List<dynamic> estadosCivilesList =
+            objeto['data'] as List<dynamic>;
+
+        print('object');
+        print(estadosCivilesList);
+
+        // final List<dynamic> municipiosList = jsonDecode(response.body);
+        return estadosCivilesList;
+      } else {
+        throw Exception(
+          'Error en la solicitud: Código ${response.statusCode}, Respuesta: ${response.body}',
         );
-
-        if (response.statusCode == 200) {
-
-          
-          final Map<String,dynamic > objeto = jsonDecode(response.body);
-          final List<dynamic> estadosCivilesList = objeto['data'] as List<dynamic>;
-
-          print('object');
-          print(estadosCivilesList);
-
-          // final List<dynamic> municipiosList = jsonDecode(response.body);
-          return estadosCivilesList;
-
-        } else {
-          throw Exception(
-            'Error en la solicitud: Código ${response.statusCode}, Respuesta: ${response.body}',
-          );
-        }
-      } catch (e) {
-        developer.log('Get Municipios Error: $e');
-        throw Exception('Error en la solicitud: $e');
       }
-    } 
+    } catch (e) {
+      developer.log('Get Municipios Error: $e');
+      throw Exception('Error en la solicitud: $e');
+    }
+  }
   // listarmunicipios
 
-
-
-
-
-  Future<List<dynamic>> getCargos() async{
-
+  Future<List<dynamic>> getCargos() async {
     final url = Uri.parse('http://$apiServer/api/Cargos/ListarCargos');
     developer.log('Get Cargos Request URL: $url');
 
     try {
+      final response = await http.get(
+        url,
+        headers: {'Content-Type': 'application/json', 'X-Api-Key': _apikey},
+      );
 
-        final response = await http.get(
-          url,
-          headers: {'Content-Type': 'application/json', 'X-Api-Key': _apikey}
+      developer.log('Get Cargos Response Status: ${response.statusCode}');
+      developer.log('Get Cargos Response Body: ${response.body}');
+      print('respuesta');
+      print(response.body);
+
+      if (response.statusCode == 200) {
+        final List<dynamic> cargosList = jsonDecode(response.body);
+        return cargosList;
+      } else {
+        throw Exception(
+          'Error en la solicitud: Código ${response.statusCode}, Respuesta: ${response.body}',
         );
-
-        developer.log('Get Cargos Response Status: ${response.statusCode}');
-        developer.log('Get Cargos Response Body: ${response.body}');
-        print('respuesta');
-        print(response.body);
-
-        if (response.statusCode == 200) {
-
-          final List<dynamic> cargosList = jsonDecode(response.body);
-          return cargosList;
-
-        } else {
-          throw Exception(
-            'Error en la solicitud: Código ${response.statusCode}, Respuesta: ${response.body}',
-          );
-        }
-      } catch (e) {
-        developer.log('Get Cargos Error: $e');
-        throw Exception('Error en la solicitud: $e');
       }
-
+    } catch (e) {
+      developer.log('Get Cargos Error: $e');
+      throw Exception('Error en la solicitud: $e');
+    }
   }
   // Listar Cargos
 
-  Future<List<dynamic>> getCategorias() async{
-
+  Future<List<dynamic>> getCategorias() async {
     final url = Uri.parse('http://$apiServer/api/Categorias/ListarCategorias');
     developer.log('Get Categorias Request URL: $url');
 
     try {
+      final response = await http.get(
+        url,
+        headers: {'Content-Type': 'application/json', 'X-Api-Key': _apikey},
+      );
 
-        final response = await http.get(
-          url,
-          headers: {'Content-Type': 'application/json', 'X-Api-Key': _apikey},
+      developer.log('Get Categorias Response Status: ${response.statusCode}');
+      developer.log('Get Categorias Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final List<dynamic> categoriasList = jsonDecode(response.body);
+        return categoriasList;
+      } else {
+        throw Exception(
+          'Error en la solicitud: Código ${response.statusCode}, Respuesta: ${response.body}',
         );
-
-        developer.log('Get Categorias Response Status: ${response.statusCode}');
-        developer.log('Get Categorias Response Body: ${response.body}');
-
-        if (response.statusCode == 200) {
-
-          final List<dynamic> categoriasList = jsonDecode(response.body);
-          return categoriasList;
-
-        } else {
-          throw Exception(
-            'Error en la solicitud: Código ${response.statusCode}, Respuesta: ${response.body}',
-          );
-        }
-      } catch (e) {
-        developer.log('Get Categorias Error: $e');
-        throw Exception('Error en la solicitud: $e');
       }
-
+    } catch (e) {
+      developer.log('Get Categorias Error: $e');
+      throw Exception('Error en la solicitud: $e');
+    }
   }
 
-  Future<List<dynamic>> getTiposContrato() async{
-
-    final url = Uri.parse('http://$apiServer/api/TiposContrato/ListarTiposContrato');
+  Future<List<dynamic>> getTiposContrato() async {
+    final url = Uri.parse(
+      'http://$apiServer/api/TiposContrato/ListarTiposContrato',
+    );
     developer.log('Get Tipos Contrato Request URL: $url');
 
     try {
+      final response = await http.get(
+        url,
+        headers: {'Content-Type': 'application/json', 'X-Api-Key': _apikey},
+      );
 
-        final response = await http.get(
-          url,
-          headers: {'Content-Type': 'application/json', 'X-Api-Key': _apikey},
+      developer.log(
+        'Get Tipos Contrato Response Status: ${response.statusCode}',
+      );
+      developer.log('Get Tipos Contrato Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final List<dynamic> tiposContratoList = jsonDecode(response.body);
+        return tiposContratoList;
+      } else {
+        throw Exception(
+          'Error en la solicitud: Código ${response.statusCode}, Respuesta: ${response.body}',
         );
-
-        developer.log('Get Tipos Contrato Response Status: ${response.statusCode}');
-        developer.log('Get Tipos Contrato Response Body: ${response.body}');
-
-        if (response.statusCode == 200) {
-
-          final List<dynamic> tiposContratoList = jsonDecode(response.body);
-          return tiposContratoList;
-
-        } else {
-          throw Exception(
-            'Error en la solicitud: Código ${response.statusCode}, Respuesta: ${response.body}',
-          );
-        }
-      } catch (e) {
-        developer.log('Get Tipos Contrato Error: $e');
-        throw Exception('Error en la solicitud: $e');
       }
-
-    
+    } catch (e) {
+      developer.log('Get Tipos Contrato Error: $e');
+      throw Exception('Error en la solicitud: $e');
+    }
   }
 
   
@@ -448,11 +420,21 @@ class PlazaService {
     
   }
   
-
-  Future crearPersonaUsuario(String nombre, String contrasena, String correo,
-                     String imagen, String dni, String nombres, String apellidos,
-                     String telefono, String? sexo, String direccion, int? estadocivil,
-                     String? municipio) async {
+ Future crearPersonaUsuario(
+    String nombre,
+    String contrasena,
+    String correo,
+    String imagen,
+    String dni,
+    String nombres,
+    String apellidos,
+    String telefono,
+    String? sexo,
+    String direccion,
+    int? estadocivil,
+    String? municipio,
+    int? roleId,
+  ) async {
 
     final url = Uri.parse(_baseUrl);
 
@@ -478,7 +460,7 @@ class PlazaService {
       "pers_FechaCreacion": "2025-05-27T13:51:24.104Z",
       "usua_Modificacion": 0,
       "usuaM_Nombre": "string",
-      "pers_FechaModificacion": "2025-05-27T13:51:24.104Z"
+      "pers_FechaModificacion": "2025-05-27T13:51:24.104Z",
     };
 
     developer.log('Login Request URL: $url');
@@ -499,27 +481,26 @@ class PlazaService {
       developer.log('Login Response Body: ${response.body}');
 
       final requestBodyUsua = {
-         "usua_Id": 0,
-          "usua_Nombre": nombre,
-          "usua_Contrasena": contrasena,
-          "usua_Correo": correo,
-          "usua_EsAdmin": true,
-          "usua_Publicador": true,
-          "usua_Imagen": imagen,
-          "pers_Id": 1,
-          "role_Id": 4,
-          "pers_Nombres": "string",
-          "pers_Apellidos": "string",
-          "role_Descripcion": "string",
-          "usua_Creacion": 1,
-          "usua_FechaCreacion": "2025-05-27T12:12:09.180Z",
-          "usua_Modificacion": 0,
-          "usua_FechaModificacion": "2025-05-27T12:12:09.180Z",
-          "usua_Estado": true
-    };
+        "usua_Id": 0,
+        "usua_Nombre": nombre,
+        "usua_Contrasena": contrasena,
+        "usua_Correo": correo,
+        "usua_EsAdmin": true,
+        "usua_Publicador": true,
+        "usua_Imagen": imagen,
+        "pers_Id": 1,
+        "role_Id": roleId,
+        "pers_Nombres": "string",
+        "pers_Apellidos": "string",
+        "role_Descripcion": "string",
+        "usua_Creacion": 1,
+        "usua_FechaCreacion": "2025-05-27T12:12:09.180Z",
+        "usua_Modificacion": 0,
+        "usua_FechaModificacion": "2025-05-27T12:12:09.180Z",
+        "usua_Estado": true,
+      };
 
       if (response.statusCode == 200) {
-        
         try {
           final responseUsuario = await http.post(
             Uri.parse('http://$apiServer/api/Usuarios/Insertar'),
@@ -532,9 +513,7 @@ class PlazaService {
           developer.log('Login Response Body: ${responseUsuario.body}');
 
           if (responseUsuario.statusCode == 200) {
-
-             return 'creada';
-
+            return 'creada';
           } else {
             throw Exception(
               'Error en la solicitud: Código ${responseUsuario.statusCode}, Respuesta: ${responseUsuario.body}',
@@ -546,7 +525,6 @@ class PlazaService {
         }
 
         // return 'creada';
-
       } else {
         throw Exception(
           'Error en la solicitud: Código ${response.statusCode}, Respuesta: ${response.body}',
@@ -558,46 +536,37 @@ class PlazaService {
     }
   }
 
-
-
   Future<List<dynamic>> listarPlazas() async {
-
     final url = Uri.parse('http://$apiServer/api/Plazas/ListarPlazas');
     developer.log('Get plazas Request URL: $url');
 
     try {
+      final response = await http.get(
+        url,
+        headers: {'Content-Type': 'application/json', 'X-Api-Key': _apikey},
+      );
 
-        final response = await http.get(
-          url,
-          headers: {'Content-Type': 'application/json', 'X-Api-Key': _apikey},
+      developer.log(
+        'Get Tipos Contrato Response Status: ${response.statusCode}',
+      );
+      developer.log('Get Tipos Contrato Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final List<dynamic> plazaslist = jsonDecode(response.body);
+        return plazaslist;
+      } else {
+        throw Exception(
+          'Error en la solicitud: Código ${response.statusCode}, Respuesta: ${response.body}',
         );
-
-        developer.log('Get Tipos Contrato Response Status: ${response.statusCode}');
-        developer.log('Get Tipos Contrato Response Body: ${response.body}');
-
-        if (response.statusCode == 200) {
-
-          final List<dynamic> plazaslist = jsonDecode(response.body);
-          return plazaslist;
-
-        } else {
-          throw Exception(
-            'Error en la solicitud: Código ${response.statusCode}, Respuesta: ${response.body}',
-          );
-        }
-      } catch (e) {
-        developer.log('listar plazas Error: $e');
-        throw Exception('Error al listar plazas: $e');
       }
-
-
+    } catch (e) {
+      developer.log('listar plazas Error: $e');
+      throw Exception('Error al listar plazas: $e');
+    }
   }
 
   Future<List<dynamic>> buscarPlaza(String plazaid) async {
-
     final requestBody = {
-
-      
       "plaz_Id": plazaid,
       "plaz_Descripcion": "string",
       "plaz_Informacion": "string",
@@ -614,41 +583,34 @@ class PlazaService {
       "usua_Creacion": 0,
       "plaz_FechaCreacion": "2025-05-30T18:40:05.381Z",
       "usua_Modificacion": 0,
-      "plaz_FechaModificacion": "2025-05-30T18:40:05.381Z"
-    
-
+      "plaz_FechaModificacion": "2025-05-30T18:40:05.381Z",
     };
 
     final url = Uri.parse('http://$apiServer/api/Plazas/BuscarPlaza');
     developer.log('Get plazas Request URL: $url');
 
     try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json', 'X-Api-Key': _apikey},
+        body: jsonEncode(requestBody),
+      );
 
-        final response = await http.post(
-          url,
-          headers: {'Content-Type': 'application/json', 'X-Api-Key': _apikey},
-          body: jsonEncode(requestBody)
+      developer.log('buscar plaza Response Status: ${response.statusCode}');
+      developer.log('buscar plaza Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final List<dynamic> plazaslist = jsonDecode(response.body);
+        return plazaslist;
+      } else {
+        throw Exception(
+          'Error en la solicitud: Código ${response.statusCode}, Respuesta: ${response.body}',
         );
-
-        developer.log('buscar plaza Response Status: ${response.statusCode}');
-        developer.log('buscar plaza Response Body: ${response.body}');
-
-        if (response.statusCode == 200) {
-
-          final List<dynamic> plazaslist = jsonDecode(response.body);
-          return plazaslist;
-
-        } else {
-          throw Exception(
-            'Error en la solicitud: Código ${response.statusCode}, Respuesta: ${response.body}',
-          );
-        }
-      } catch (e) {
-        developer.log('buscar plaza Error: $e');
-        throw Exception('Error al buscar plaza: $e');
       }
-
-
+    } catch (e) {
+      developer.log('buscar plaza Error: $e');
+      throw Exception('Error al buscar plaza: $e');
+    }
   }
 
 
