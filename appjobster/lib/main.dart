@@ -1,19 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:jobster/screen/principalPlazasScreen.dart';
-import 'package:jobster/screen/verGuardadosScreen';
+
+import 'package:jobster/screen/verGuardadosScreen.dart';
+import 'package:jobster/screen/verPlazasSolicitadasScreen.dart';
 import 'screen/pre-login.dart';
 import 'screen/publicarPlazaScreen.dart';
 import 'screen/perfilScreen.dart';
 import 'services/navigation_service.dart';
 import 'services/Session.dart';
 
+
 void main() {
   runApp(const MyApp());
 }
 
+final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<void>>();
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+  
 
+  
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -25,6 +32,7 @@ class MyApp extends StatelessWidget {
         ),
       ),
       home: const prelogin(),
+      navigatorObservers: [routeObserver],
     );
   }
 }
@@ -45,6 +53,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     // const Center(child: Text('Inicio')),
     const PublicarPlazaScreen(),
     const VerGuardadosScreen(),
+    const VerPlazasSolicitadasScreen(),
     const PerfilScreen(),
   ];
 
@@ -73,7 +82,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         const BottomNavigationBarItem(
             icon: Icon(Icons.control_point, size: 35), label: 'Publicar'),
       
-      const BottomNavigationBarItem(icon: Icon(Icons.save_alt_rounded), label: 'Guardados' ),
+      const BottomNavigationBarItem(icon: Icon(Icons.bookmarks_sharp), label: 'Guardados' ),
+      const BottomNavigationBarItem(icon: Icon(Icons.list_alt_sharp), label: 'Solicitudes' ),
       const BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
       
     ];

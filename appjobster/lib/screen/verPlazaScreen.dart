@@ -709,10 +709,29 @@ Widget build(BuildContext context) {
                                     future: requisitosList,
                                     builder: (context, requisitosSnapshot) {
                                       if (requisitosSnapshot.connectionState == ConnectionState.waiting) {
-                                        return const Padding(
-                                          padding: EdgeInsets.symmetric(vertical: 12),
-                                          child: LinearProgressIndicator(),
-                                        );
+                                        return Center(
+                                            child: Column(
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: const [
+                                                SizedBox(height: 40),
+                                                CircularProgressIndicator(
+                                                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFEE4D00)),
+                                                  strokeWidth: 4,
+                                                ),
+                                                SizedBox(height: 18),
+                                                Text(
+                                                  'Cargando plaza...',
+                                                  style: TextStyle(
+                                                    fontSize: 18,
+                                                    color: Color(0xFFEE4D00),
+                                                    fontWeight: FontWeight.bold,
+                                                    letterSpacing: 0.5,
+                                                  ),
+                                                ),
+                                                SizedBox(height: 40),
+                                              ],
+                                            ),
+                                          );
                                       } else if (requisitosSnapshot.hasError) {
                                         return const Padding(
                                           padding: EdgeInsets.symmetric(vertical: 12),

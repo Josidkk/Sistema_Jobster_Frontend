@@ -18,14 +18,16 @@ import 'dart:convert';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
-class VerGuardadosScreen extends StatefulWidget {
-  const VerGuardadosScreen({super.key});
+import '../main.dart';
+
+class VerPlazasSolicitadasScreen extends StatefulWidget {
+  const VerPlazasSolicitadasScreen({super.key});
 
   @override
-  State<VerGuardadosScreen> createState() => _VerGuardadosScreenState();
+  State<VerPlazasSolicitadasScreen> createState() => _VerPlazasSolicitadasScreenState();
 }
 
-class _VerGuardadosScreenState extends State<VerGuardadosScreen> {
+class _VerPlazasSolicitadasScreenState extends State<VerPlazasSolicitadasScreen> {
   final _plazaService = PlazaService();
 
   final TextEditingController _usuarioController = TextEditingController();
@@ -45,8 +47,9 @@ class _VerGuardadosScreenState extends State<VerGuardadosScreen> {
   late final municipiosList;
   late final categoriasList;
   late final tiposContratoList;
-  late final plazasList ;
-  late final guardadosList ;
+  late final plazasList;
+  
+  late final solicitudeslist;
 
   File? _selectedImage;
 
@@ -68,7 +71,8 @@ class _VerGuardadosScreenState extends State<VerGuardadosScreen> {
     municipiosList = _plazaService.getMunicipios();
     tiposContratoList = _plazaService.getTiposContrato();
     plazasList = _plazaService.listarPlazas();
-    guardadosList = _plazaService.getGuardados();
+    
+    solicitudeslist = _plazaService.getSolicitudes();
   }
 
   @override
@@ -142,7 +146,7 @@ class _VerGuardadosScreenState extends State<VerGuardadosScreen> {
                         const SizedBox(height: 24),
                         const Center(
                           child: Text(
-                            'Tus Plazas Guardadas',
+                            'Tus Plazas Solicitadas',
                             style: TextStyle(
                               fontSize: 26,
                               fontWeight: FontWeight.bold,
@@ -159,7 +163,6 @@ class _VerGuardadosScreenState extends State<VerGuardadosScreen> {
                           future: plazasList,
                           builder: (context, snapshot) {
                             if (snapshot.connectionState == ConnectionState.waiting) {
-                              
                               return 
                                 Center(
                                     child: Column(
@@ -172,7 +175,7 @@ class _VerGuardadosScreenState extends State<VerGuardadosScreen> {
                                         ),
                                         SizedBox(height: 18),
                                         Text(
-                                          'Cargando Plazas Guardadas...',
+                                          'Cargando plazas Solicitadas...',
                                           style: TextStyle(
                                             fontSize: 18,
                                             color: Color(0xFFEE4D00),
@@ -184,8 +187,7 @@ class _VerGuardadosScreenState extends State<VerGuardadosScreen> {
                                       ],
                                     ),
                                   );
-
-                            
+                              
                             } else if (snapshot.hasError) {
                               return Text('Error: ${snapshot.error}');
                             } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -194,63 +196,24 @@ class _VerGuardadosScreenState extends State<VerGuardadosScreen> {
                               final plazas = snapshot.data!;
 
                               return FutureBuilder<List<dynamic>>(
-                                future: guardadosList,
-                                builder: (context, guardadosSnapshot) {
-                                  if (guardadosSnapshot.connectionState == ConnectionState.waiting) {
+                                future: solicitudeslist,
+                                builder: (context, solicitudesSnapshot) {
+                                  if (solicitudesSnapshot.connectionState == ConnectionState.waiting) {
                                     return CircularProgressIndicator();
-                                  } else if (guardadosSnapshot.hasError) {
-                                    return Text('Error: ${guardadosSnapshot.error}');
-                                  } else if (!guardadosSnapshot.hasData || guardadosSnapshot.data!.isEmpty) {
+                                  } else if (solicitudesSnapshot.hasError) {
+                                    return Text('Error: ${solicitudesSnapshot.error}');
+                                  } else if (!solicitudesSnapshot.hasData || solicitudesSnapshot.data!.isEmpty) {
+                                    
                                     return
-                                    Center(
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(vertical: 32),
-                                        child: Column(
-                                          children: const [
-                                            Icon(Icons.bookmark_border, color: Color(0xFFEE4D00), size: 54),
-                                            SizedBox(height: 12),
-                                            Text(
-                                              'No tienes plazas guardadas',
-                                              style: TextStyle(
-                                                fontSize: 20,
-                                                color: Color(0xFFEE4D00),
-                                                fontWeight: FontWeight.bold,
-                                                letterSpacing: 0.5,
-                                              ),
-                                              textAlign: TextAlign.center,
-                                            ),
-                                            SizedBox(height: 6),
-                                            Text(
-                                              '¡Guarda tus plazas de interes para verlas aquí!',
-                                              style: TextStyle(
-                                                fontSize: 15,
-                                                color: Colors.black54,
-                                              ),
-                                              textAlign: TextAlign.center,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                    
-
-                                  } else {
-                                    final guardados = guardadosSnapshot.data!;
-
-                                    final guardadosUsuario = guardados.where((guardado) => guardado['usua_Id']== Session.usuario_id);
-
-                                    final plazasUsuario = plazas.where((plaza) => guardadosUsuario.any((guardado) => guardado['plaz_Id'] == plaza['plaz_Id']));
-                                    
-                                    if (plazasUsuario.isEmpty) {
-                                      return Center(
+                                      Center(
                                         child: Padding(
                                           padding: const EdgeInsets.symmetric(vertical: 32),
                                           child: Column(
                                             children: const [
-                                              Icon(Icons.bookmark_border, color: Color(0xFFEE4D00), size: 54),
+                                              Icon(Icons.assignment_outlined, color: Color(0xFFEE4D00), size: 54),
                                               SizedBox(height: 12),
                                               Text(
-                                                'No tienes plazas guardadas',
+                                                'No tienes plazas solicitadas',
                                                 style: TextStyle(
                                                   fontSize: 20,
                                                   color: Color(0xFFEE4D00),
@@ -261,7 +224,48 @@ class _VerGuardadosScreenState extends State<VerGuardadosScreen> {
                                               ),
                                               SizedBox(height: 6),
                                               Text(
-                                                '¡Guarda tus plazas de interes para verlas aquí!',
+                                                '¡Aplica a plazas para verlas aquí!',
+                                                style: TextStyle(
+                                                  fontSize: 15,
+                                                  color: Colors.black54,
+                                                ),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      );
+
+                                     
+                                  } else {
+
+                                    final solicitudes = solicitudesSnapshot.data!;
+
+                                    final solicitudesUsuario = solicitudes.where((solicitud) => solicitud['usua_Id']== Session.usuario_id);
+
+                                    final plazasUsuario = plazas.where((plaza) => solicitudesUsuario.any((solicitud) => solicitud['plaz_Id'] == plaza['plaz_Id']));
+
+                                    if (plazasUsuario.isEmpty) {
+                                      return Center(
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(vertical: 32),
+                                          child: Column(
+                                            children: const [
+                                              Icon(Icons.assignment_outlined, color: Color(0xFFEE4D00), size: 54),
+                                              SizedBox(height: 12),
+                                              Text(
+                                                'No tienes plazas solicitadas',
+                                                style: TextStyle(
+                                                  fontSize: 20,
+                                                  color: Color(0xFFEE4D00),
+                                                  fontWeight: FontWeight.bold,
+                                                  letterSpacing: 0.5,
+                                                ),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                              SizedBox(height: 6),
+                                              Text(
+                                                '¡Aplica a plazas para verlas aquí!',
                                                 style: TextStyle(
                                                   fontSize: 15,
                                                   color: Colors.black54,

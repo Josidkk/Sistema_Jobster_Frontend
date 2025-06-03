@@ -339,7 +339,29 @@ class _PrincipalPlazasScreenState extends State<PrincipalPlazasScreen> {
                           future: plazasList,
                           builder: (context, snapshot) {
                             if (snapshot.connectionState == ConnectionState.waiting) {
-                              return CircularProgressIndicator();
+                              return Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: const [
+                                    SizedBox(height: 40),
+                                    CircularProgressIndicator(
+                                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFEE4D00)),
+                                      strokeWidth: 4,
+                                    ),
+                                    SizedBox(height: 18),
+                                    Text(
+                                      'Cargando plazas...',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        color: Color(0xFFEE4D00),
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 0.5,
+                                      ),
+                                    ),
+                                    SizedBox(height: 40),
+                                  ],
+                                ),
+                              );
                             } else if (snapshot.hasError) {
                               return Text('Error: ${snapshot.error}');
                             } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
