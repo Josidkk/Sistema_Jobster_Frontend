@@ -485,8 +485,8 @@ class PlazaService {
         "usua_Nombre": nombre,
         "usua_Contrasena": contrasena,
         "usua_Correo": correo,
-        "usua_EsAdmin": true,
-        "usua_Publicador": true,
+        "usua_EsAdmin": false,
+        "usua_Publicador":  (roleId == 4) ? true : false, // Publicador solo si es rol de publicador
         "usua_Imagen": imagen,
         "pers_Id": 1,
         "role_Id": roleId,
