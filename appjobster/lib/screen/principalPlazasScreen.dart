@@ -293,7 +293,7 @@ class _PrincipalPlazasScreenState extends State<PrincipalPlazasScreen> {
         ),
         child: SafeArea(
           child: Center(
-            
+
             child: SingleChildScrollView(
               
               child: Padding(
@@ -453,167 +453,167 @@ class _PrincipalPlazasScreenState extends State<PrincipalPlazasScreen> {
                                 //   ],
                                 // )
 
-Row(
-  crossAxisAlignment: CrossAxisAlignment.start,
-  children: [
-    Expanded(
-      child: SizedBox(
-        height: 300,
-        child: Card(
-          color: const Color(0xFFFFF3E0),
-          shape: const BeveledRectangleBorder(
-            borderRadius: BorderRadius.zero, // No rounded corners
-          ),
-          elevation: 6,
-          margin: const EdgeInsets.only(bottom: 25, left: 8, right: 8),
-          child: Row(
-            children: [
-              // Image section
-              ClipRRect(
-                borderRadius: BorderRadius.zero, // No rounded corners
-                child: Image.network(
-                  plaza['plaz_Imagen'] ?? '',
-                  width: 150,
-                  height: 300,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => Container(
-                    width: 150,
-                    height: 300,
-                    color: Colors.grey[300],
-                    child: const Icon(Icons.broken_image, size: 40, color: Colors.grey),
-                  ),
-                ),
-              ),
-              // Info section
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      // Title
-                      Text(
-                        plaza['plaz_Descripcion'] ?? 'Sin título',
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFFEE4D00),
-                          letterSpacing: 0.5,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 4),
-                      // Information (large text, max 4 lines)
-                      Text(
-                        plaza['plaz_Informacion'] ?? '',
-                        style: const TextStyle(
-                          fontSize: 15,
-                          color: Colors.black87,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 8),
-                      // Municipio
-                      Row(
-                        children: [
-                          const Icon(Icons.location_city, color: Colors.grey, size: 18),
-                          const SizedBox(width: 6),
-                          Expanded(
-                            child: Text(
-                              plaza['muni_Descripcion'] ?? 'Municipio',
-                              style: const TextStyle(
-                                fontSize: 15,
-                                color: Colors.black87,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 6),
-                      // Categoria
-                      Row(
-                        children: [
-                          const Icon(Icons.category, color: Colors.grey, size: 18),
-                          const SizedBox(width: 6),
-                          Expanded(
-                            child: Text(
-                              plaza['cate_Descripcion'] ?? 'Categoría',
-                              style: const TextStyle(
-                                fontSize: 15,
-                                color: Colors.black87,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 6),
-                      // Cargo
-                      Row(
-                        children: [
-                          const Icon(Icons.work, color: Colors.grey, size: 18),
-                          const SizedBox(width: 6),
-                          Expanded(
-                            child: Text(
-                              plaza['carg_Descripcion'] ?? 'Cargo',
-                              style: const TextStyle(
-                                fontSize: 15,
-                                color: Colors.black87,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const Spacer(),
-                      // Button with less height
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            
-                            Session.plaza_Id = plaza['plaz_Id'].toString() ;
-                            Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => VerPlazaScreen()),
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      child: SizedBox(
+                                        height: 300,
+                                        child: Card(
+                                          color: const Color(0xFFFFF3E0),
+                                          shape: const BeveledRectangleBorder(
+                                            borderRadius: BorderRadius.zero, // No rounded corners
+                                          ),
+                                          elevation: 6,
+                                          margin: const EdgeInsets.only(bottom: 25, left: 8, right: 8),
+                                          child: Row(
+                                            children: [
+                                              // Image section
+                                              ClipRRect(
+                                                borderRadius: BorderRadius.zero, // No rounded corners
+                                                child: Image.network(
+                                                  plaza['plaz_Imagen'] ?? '',
+                                                  width: 150,
+                                                  height: 300,
+                                                  fit: BoxFit.cover,
+                                                  errorBuilder: (context, error, stackTrace) => Container(
+                                                    width: 150,
+                                                    height: 300,
+                                                    color: Colors.grey[300],
+                                                    child: const Icon(Icons.broken_image, size: 40, color: Colors.grey),
+                                                  ),
+                                                ),
+                                              ),
+                                              // Info section
+                                              Expanded(
+                                                child: Padding(
+                                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                                                  child: Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    mainAxisAlignment: MainAxisAlignment.start,
+                                                    children: [
+                                                      // Title
+                                                      Text(
+                                                        plaza['plaz_Descripcion'] ?? 'Sin título',
+                                                        style: const TextStyle(
+                                                          fontSize: 20,
+                                                          fontWeight: FontWeight.bold,
+                                                          color: Color(0xFFEE4D00),
+                                                          letterSpacing: 0.5,
+                                                        ),
+                                                        maxLines: 2,
+                                                        overflow: TextOverflow.ellipsis,
+                                                      ),
+                                                      const SizedBox(height: 4),
+                                                      // Information (large text, max 4 lines)
+                                                      Text(
+                                                        plaza['plaz_Informacion'] ?? '',
+                                                        style: const TextStyle(
+                                                          fontSize: 15,
+                                                          color: Colors.black87,
+                                                        ),
+                                                        maxLines: 2,
+                                                        overflow: TextOverflow.ellipsis,
+                                                      ),
+                                                      const SizedBox(height: 8),
+                                                      // Municipio
+                                                      Row(
+                                                        children: [
+                                                          const Icon(Icons.location_city, color: Colors.grey, size: 18),
+                                                          const SizedBox(width: 6),
+                                                          Expanded(
+                                                            child: Text(
+                                                              plaza['muni_Descripcion'] ?? 'Municipio',
+                                                              style: const TextStyle(
+                                                                fontSize: 15,
+                                                                color: Colors.black87,
+                                                              ),
+                                                              maxLines: 1,
+                                                              overflow: TextOverflow.ellipsis,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      const SizedBox(height: 6),
+                                                      // Categoria
+                                                      Row(
+                                                        children: [
+                                                          const Icon(Icons.category, color: Colors.grey, size: 18),
+                                                          const SizedBox(width: 6),
+                                                          Expanded(
+                                                            child: Text(
+                                                              plaza['cate_Descripcion'] ?? 'Categoría',
+                                                              style: const TextStyle(
+                                                                fontSize: 15,
+                                                                color: Colors.black87,
+                                                              ),
+                                                              maxLines: 1,
+                                                              overflow: TextOverflow.ellipsis,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      const SizedBox(height: 6),
+                                                      // Cargo
+                                                      Row(
+                                                        children: [
+                                                          const Icon(Icons.work, color: Colors.grey, size: 18),
+                                                          const SizedBox(width: 6),
+                                                          Expanded(
+                                                            child: Text(
+                                                              plaza['carg_Descripcion'] ?? 'Cargo',
+                                                              style: const TextStyle(
+                                                                fontSize: 15,
+                                                                color: Colors.black87,
+                                                              ),
+                                                              maxLines: 1,
+                                                              overflow: TextOverflow.ellipsis,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      const Spacer(),
+                                                      // Button with less height
+                                                      SizedBox(
+                                                        width: double.infinity,
+                                                        child: ElevatedButton(
+                                                          onPressed: () {
+                                                            
+                                                            Session.plaza_Id = plaza['plaz_Id'].toString() ;
+                                                            Navigator.push(
+                                                            context,
+                                                            MaterialPageRoute(builder: (context) => VerPlazaScreen()),
 
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFEE4D00),
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            padding: const EdgeInsets.symmetric(vertical: 8), // Less height
-                          ),
-                          child: const Text(
-                            'Más Informacion',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    ),
-  ],
-),
+                                                            );
+                                                          },
+                                                          style: ElevatedButton.styleFrom(
+                                                            backgroundColor: const Color(0xFFEE4D00),
+                                                            foregroundColor: Colors.white,
+                                                            shape: RoundedRectangleBorder(
+                                                              borderRadius: BorderRadius.circular(4),
+                                                            ),
+                                                            padding: const EdgeInsets.symmetric(vertical: 8), // Less height
+                                                          ),
+                                                          child: const Text(
+                                                            'Más Informacion',
+                                                            style: TextStyle(
+                                                              fontWeight: FontWeight.bold,
+                                                              fontSize: 15,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
 
 
 
