@@ -195,75 +195,75 @@ class _PrincipalPlazasScreenState extends State<PrincipalPlazasScreen> {
   //   }
   // }
 
-void _publicarPlaza() async {
-  if (_formKey.currentState!.validate()) {
-    setState(() {
-      _cargando = true;
-      _mensaje = '';
-    });
+// void _publicarPlaza() async {
+//   if (_formKey.currentState!.validate()) {
+//     setState(() {
+//       _cargando = true;
+//       _mensaje = '';
+//     });
 
-    try {
-      // 1. Check if image is selected
-      if (_selectedImage == null) {
-        setState(() {
-          _mensaje = 'Por favor seleccione una imagen para la plaza';
-          _cargando = false;
-        });
-        return;
-      }
+//     try {
+//       // 1. Check if image is selected
+//       if (_selectedImage == null) {
+//         setState(() {
+//           _mensaje = 'Por favor seleccione una imagen para la plaza';
+//           _cargando = false;
+//         });
+//         return;
+//       }
 
-      // 2. Upload image to Cloudinary
-      final url = Uri.parse('https://api.cloudinary.com/v1_1/dw2aj3hcu/image/upload');
-      final request = http.MultipartRequest('POST', url)
-        ..fields['upload_preset'] = 'unsignedig'
-        ..files.add(await http.MultipartFile.fromPath('file', _selectedImage!.path));
+//       // 2. Upload image to Cloudinary
+//       final url = Uri.parse('https://api.cloudinary.com/v1_1/dw2aj3hcu/image/upload');
+//       final request = http.MultipartRequest('POST', url)
+//         ..fields['upload_preset'] = 'unsignedig'
+//         ..files.add(await http.MultipartFile.fromPath('file', _selectedImage!.path));
 
-      final response = await request.send();
+//       final response = await request.send();
 
-      if (response.statusCode == 200) {
-        final resStr = await response.stream.bytesToString();
-        final resJson = json.decode(resStr);
-        final imageUrl = resJson['secure_url'];
+//       if (response.statusCode == 200) {
+//         final resStr = await response.stream.bytesToString();
+//         final resJson = json.decode(resStr);
+//         final imageUrl = resJson['secure_url'];
 
-        // 3. Use imageUrl in your plaza creation
-        final respuesta = await _plazaService.crearPlaza(
-          _tituloController.text.trim(),
-          _informacionController.text.trim(),
-          imageUrl, // Use the Cloudinary URL here
-          _direccionController.text.trim(),
-          _selectedCategoriaId,
-          _selectedCargoId,
-          _selectedTipoContratoId,
-        );
+//         // 3. Use imageUrl in your plaza creation
+//         final respuesta = await _plazaService.crearPlaza(
+//           _tituloController.text.trim(),
+//           _informacionController.text.trim(),
+//           imageUrl, // Use the Cloudinary URL here
+//           _direccionController.text.trim(),
+//           _selectedCategoriaId,
+//           _selectedCargoId,
+//           _selectedTipoContratoId,
+//         );
 
-        if (respuesta.toString().toLowerCase().contains('creada')) {
-          setState(() {
-            _mensaje = 'Plaza Publicada con éxito';
-          });
-        } else {
-          setState(() {
-            _mensaje = 'Error al publicar la plaza: $respuesta';
-            _cargando = false;
-          });
-        }
-      } else {
-        setState(() {
-          _mensaje = 'Error al subir la imagen al Servidor';
-          _cargando = false;
-        });
-      }
-    } catch (e) {
-      setState(() {
-        _mensaje = 'ERROR AL PUBLICAR PLAZA $e';
-        _cargando = false;
-      });
-    } finally {
-      setState(() {
-        _cargando = false;
-      });
-    }
-  }
-}
+//         if (respuesta.toString().toLowerCase().contains('creada')) {
+//           setState(() {
+//             _mensaje = 'Plaza Publicada con éxito';
+//           });
+//         } else {
+//           setState(() {
+//             _mensaje = 'Error al publicar la plaza: $respuesta';
+//             _cargando = false;
+//           });
+//         }
+//       } else {
+//         setState(() {
+//           _mensaje = 'Error al subir la imagen al Servidor';
+//           _cargando = false;
+//         });
+//       }
+//     } catch (e) {
+//       setState(() {
+//         _mensaje = 'ERROR AL PUBLICAR PLAZA $e';
+//         _cargando = false;
+//       });
+//     } finally {
+//       setState(() {
+//         _cargando = false;
+//       });
+//     }
+//   }
+// }
 
   @override
   Widget build(BuildContext context) {
@@ -339,7 +339,29 @@ void _publicarPlaza() async {
                           future: plazasList,
                           builder: (context, snapshot) {
                             if (snapshot.connectionState == ConnectionState.waiting) {
-                              return CircularProgressIndicator();
+                              return Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: const [
+                                    SizedBox(height: 40),
+                                    CircularProgressIndicator(
+                                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFEE4D00)),
+                                      strokeWidth: 4,
+                                    ),
+                                    SizedBox(height: 18),
+                                    Text(
+                                      'Cargando plazas...',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        color: Color(0xFFEE4D00),
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 0.5,
+                                      ),
+                                    ),
+                                    SizedBox(height: 40),
+                                  ],
+                                ),
+                              );
                             } else if (snapshot.hasError) {
                               return Text('Error: ${snapshot.error}');
                             } else if (!snapshot.hasData || snapshot.data!.isEmpty) {

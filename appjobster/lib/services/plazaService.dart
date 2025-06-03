@@ -3,6 +3,7 @@ import 'dart:developer' as developer;
 import 'dart:ffi';
 import 'package:cloudinary_url_gen/transformation/common.dart';
 import 'package:http/http.dart' as http;
+import 'package:jobster/services/Session.dart';
 import '../models/usuarioViewModel.dart';
 import '../services/globalService.dart';
 import '../screen/registroUsuarioScreen.dart';
@@ -72,15 +73,10 @@ class PlazaService {
     }
   }
 
-  Future crearPlaza(
-    String descripcion,
-    String informacion,
-    String imagen,
-    String direccion,
-    int? cate,
-    int? carg,
-    int? tico,
-  ) async {
+
+  Future crearPlaza(String descripcion, String informacion, String imagen, String direccion,
+                    int? cate, int? carg, int? tico, List<Map<String, String>> requisitos) async {
+
     final url = Uri.parse(_baseUrl);
 
     // Using the exact format from the cURL example
@@ -129,6 +125,32 @@ class PlazaService {
         // } else {
         //   return Usuario.fromJson(jsonList[0]);
         // }
+
+        requisitos.forEach( (requisito) async {
+
+          final requisitoBody = {
+
+            "requ_Id": 0,
+            "requ_Descripcion": requisito['requ_Descripcion'],
+            "requ_Informacion": requisito['requ_Informacion'],
+            "requ_Estado": true,
+            "usua_Creacion": Session.usuario_id,
+            "plaz_Id": 0,
+            "requ_FechaCreacion": DateTime.now().toIso8601String(),
+            "usua_Modificacion": 0,
+            "requ_FechaModificacion": "2025-06-02T19:43:48.358Z"
+          };
+
+          final responseRequ = await http.post(
+            Uri.parse('http://$apiServer/api/Requisitos/InsertarRequisito'),
+            headers: {'Content-Type': 'application/json', 'X-Api-Key': _apikey},
+            body: jsonEncode(requisitoBody),
+          );
+
+          
+        }
+        );
+        
         return 'creada';
       } else {
         throw Exception(
@@ -297,7 +319,108 @@ class PlazaService {
     }
   }
 
-  Future crearPersonaUsuario(
+  
+  Future<List<dynamic>> getSolicitudes() async{
+
+    final url = Uri.parse('http://$apiServer/api/Solicitudes/ListarSolicitudes');
+    developer.log('Get Solicitudes Request URL: $url');
+
+    try {
+
+        final response = await http.get(
+          url,
+          headers: {'Content-Type': 'application/json', 'X-Api-Key': _apikey},
+        );
+
+        developer.log('Get Solicitudes Response Status: ${response.statusCode}');
+        developer.log('Get Solicitudes Response Body: ${response.body}');
+
+        if (response.statusCode == 200) {
+
+          final List<dynamic> solicitudeslist = jsonDecode(response.body);
+          return solicitudeslist;
+
+        } else {
+          throw Exception(
+            'Error en la solicitud: Código ${response.statusCode}, Respuesta: ${response.body}',
+          );
+        }
+      } catch (e) {
+        developer.log('Get Solicitudes Error: $e');
+        throw Exception('Error en la solicitud: $e');
+      }
+
+    
+  }
+
+  
+  Future<List<dynamic>> getGuardados() async{
+
+    final url = Uri.parse('http://$apiServer/api/Guardados/ListarGuardados');
+    developer.log('Get Guardados Request URL: $url');
+
+    try {
+
+        final response = await http.get(
+          url,
+          headers: {'Content-Type': 'application/json', 'X-Api-Key': _apikey},
+        );
+
+        developer.log('Get Guardados Response Status: ${response.statusCode}');
+        developer.log('Get Guardados Response Body: ${response.body}');
+
+        if (response.statusCode == 200) {
+
+          final List<dynamic> guardadoslist = jsonDecode(response.body);
+          return guardadoslist;
+
+        } else {
+          throw Exception(
+            'Error en la solicitud: Código ${response.statusCode}, Respuesta: ${response.body}',
+          );
+        }
+      } catch (e) {
+        developer.log('Get guardados Error: $e');
+        throw Exception('Error en la solicitud: $e');
+      }
+
+    
+  }
+  
+  Future<List<dynamic>> getRequisitos() async{
+
+    final url = Uri.parse('http://$apiServer/api/Requisitos/ListarRequisitos');
+    developer.log('Get Guardados Request URL: $url');
+
+    try {
+
+        final response = await http.get(
+          url,
+          headers: {'Content-Type': 'application/json', 'X-Api-Key': _apikey},
+        );
+
+        developer.log('Get Requisitos Response Status: ${response.statusCode}');
+        developer.log('Get Requisitos Response Body: ${response.body}');
+
+        if (response.statusCode == 200) {
+
+          final List<dynamic> requisitoslist = jsonDecode(response.body);
+          return requisitoslist;
+
+        } else {
+          throw Exception(
+            'Error en la solicitud: Código ${response.statusCode}, Respuesta: ${response.body}',
+          );
+        }
+      } catch (e) {
+        developer.log('Get Requisitos Error: $e');
+        throw Exception('Error en la solicitud: $e');
+      }
+
+    
+  }
+  
+ Future crearPersonaUsuario(
     String nombre,
     String contrasena,
     String correo,
@@ -312,6 +435,7 @@ class PlazaService {
     String? municipio,
     int? roleId,
   ) async {
+
     final url = Uri.parse(_baseUrl);
 
     // Using the exact format from the cURL example
@@ -488,4 +612,220 @@ class PlazaService {
       throw Exception('Error al buscar plaza: $e');
     }
   }
+
+
+  Future crearSolicitud(String? plazaid, String? usuaid) async {
+
+    final url = Uri.parse(_baseUrl);
+
+    // Using the exact format from the cURL example
+    final requestBody = {
+       
+      "soli_Id": 0,
+      "soli_Comentario": "string",
+      "soli_Revision": "string",
+      "plaz_Id": plazaid,
+      "usua_Id": usuaid,
+      "soli_Estado": true,
+      "usua_Creacion": usuaid,
+      "soli_FechaCreacion": DateTime.now().toIso8601String(),
+      "usua_Modificacion": 0,
+      "soli_FechaModificacion": DateTime.now().toIso8601String()
+
+    };
+
+    developer.log('solicitud Request URL: $url');
+    developer.log(
+      'solicitud Request Headers: ${{'Content-Type': 'application/json', 'X-Api-Key': _apikey}}',
+    );
+    developer.log('Login Request Body: ${jsonEncode(requestBody)}');
+
+    try {
+      final response = await http.post(
+        Uri.parse('http://$apiServer/api/Solicitudes/InsertarSolicitud'),
+        headers: {'Content-Type': 'application/json', 'X-Api-Key': _apikey},
+        body: jsonEncode(requestBody),
+      );
+
+      // Log the response for debugging
+      developer.log('solicitud Response Status: ${response.statusCode}');
+      developer.log('solicitud Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        
+        return 'creada';
+
+      } else {
+        throw Exception(
+          'Error en la solicitud: Código ${response.statusCode}, Respuesta: ${response.body}',
+        );
+      }
+    } catch (e) {
+      developer.log('Solicitud Error: $e');
+      throw Exception('Error al Solicitar Plaza: $e');
+    }
+  }
+
+   Future eliminarSolicitud(String? soliId) async {
+
+    final url = Uri.parse(_baseUrl);
+
+    // Using the exact format from the cURL example
+    final requestBody = {
+       
+      "soli_Id": soliId,
+      "soli_Comentario": "string",
+      "soli_Revision": "string",
+      "plaz_Id": 0,
+      "usua_Id": 0,
+      "soli_Estado": true,
+      "usua_Creacion": 0,
+      "soli_FechaCreacion": DateTime.now().toIso8601String(),
+      "usua_Modificacion": 0,
+      "soli_FechaModificacion": DateTime.now().toIso8601String()
+
+    };
+
+    developer.log('solicitud Request URL: $url');
+    developer.log(
+      'solicitud Request Headers: ${{'Content-Type': 'application/json', 'X-Api-Key': _apikey}}',
+    );
+    developer.log('Login Request Body: ${jsonEncode(requestBody)}');
+
+    try {
+      final response = await http.post(
+        Uri.parse('http://$apiServer/api/Solicitudes/EliminarSolicitud'),
+        headers: {'Content-Type': 'application/json', 'X-Api-Key': _apikey},
+        body: jsonEncode(requestBody),
+      );
+
+      // Log the response for debugging
+      developer.log('solicitud Response Status: ${response.statusCode}');
+      developer.log('solicitud Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        
+        return 'eliminada';
+
+      } else {
+        throw Exception(
+          'Error en la solicitud: Código ${response.statusCode}, Respuesta: ${response.body}',
+        );
+      }
+    } catch (e) {
+      developer.log('Solicitud Error: $e');
+      throw Exception('Error al Solicitar Plaza: $e');
+    }
+  }
+
+  Future crearGuardado(String? plazaid, String? usuaid) async {
+
+    final url = Uri.parse(_baseUrl);
+
+    // Using the exact format from the cURL example
+    final requestBody = {
+            
+      "guar_Id": 0,
+      "plaz_Id": plazaid,
+      "usua_Id": usuaid,
+      "guar_Estado": true,
+      "usua_Creacion": 0,
+      "guar_FechaCreacion": DateTime.now().toIso8601String(),
+      "usua_Modificacion": 0,
+      "guar_FechaModificacion": "2025-06-02T09:49:20.622Z"
+
+    };
+
+    developer.log('Guardado Request URL: $url');
+    developer.log(
+      'Guardado Request Headers: ${{'Content-Type': 'application/json', 'X-Api-Key': _apikey}}',
+    );
+    developer.log('Guardado Request Body: ${jsonEncode(requestBody)}');
+
+    try {
+      final response = await http.post(
+        Uri.parse('http://$apiServer/api/Guardados/InsertarGuardado'),
+        headers: {'Content-Type': 'application/json', 'X-Api-Key': _apikey},
+        body: jsonEncode(requestBody),
+      );
+
+      // Log the response for debugging
+      developer.log('Guardado Response Status: ${response.statusCode}');
+      developer.log('Guardado Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        
+        return 'creada';
+
+      } else {
+        throw Exception(
+          'Error en el guardado: Código ${response.statusCode}, Respuesta: ${response.body}',
+        );
+      }
+    } catch (e) {
+      developer.log('Guardado Error: $e');
+      throw Exception('Error al Guardar Plaza: $e');
+    }
+  }
+
+  Future eliminarGuardado(String? guarid) async {
+
+    final url = Uri.parse(_baseUrl);
+
+    // Using the exact format from the cURL example
+    final requestBody = {
+            
+      "guar_Id": guarid,
+      "plaz_Id": 0,
+      "usua_Id": 0,
+      "guar_Estado": true,
+      "usua_Creacion": 0,
+      "guar_FechaCreacion": DateTime.now().toIso8601String(),
+      "usua_Modificacion": 0,
+      "guar_FechaModificacion": "2025-06-02T09:49:20.622Z"
+
+    };
+    
+    developer.log('Guardado Request URL: $url');
+    developer.log(
+      'Guardado Request Headers: ${{'Content-Type': 'application/json', 'X-Api-Key': _apikey}}',
+    );
+    developer.log('Guardado Request Body: ${jsonEncode(requestBody)}');
+
+    try {
+      final response = await http.post(
+        Uri.parse('http://$apiServer/api/Guardados/EliminarGuardado'),
+        headers: {'Content-Type': 'application/json', 'X-Api-Key': _apikey},
+        body: jsonEncode(requestBody),
+      );
+
+      // Log the response for debugging
+      developer.log('Guardado Response Status: ${response.statusCode}');
+      developer.log('Guardado Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        
+        return 'eliminada';
+
+      } else {
+        throw Exception(
+          'Error en eliminar el guardado: Código ${response.statusCode}, Respuesta: ${response.body}',
+        );
+      }
+    } catch (e) {
+      developer.log('Guardado eliminar Error: $e');
+      throw Exception('Error al eliminar Guardado: $e');
+    }
+  }
+
+
+
+
+
+
+
+
+
+
+
 }

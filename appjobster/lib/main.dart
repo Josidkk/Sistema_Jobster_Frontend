@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:jobster/screen/principalPlazasScreen.dart';
+
+import 'package:jobster/screen/verGuardadosScreen.dart';
+import 'package:jobster/screen/verPlazasSolicitadasScreen.dart';
 import 'screen/pre-login.dart';
 import 'screen/publicarPlazaScreen.dart';
 import 'screen/perfilScreen.dart';
@@ -8,13 +11,18 @@ import 'screen/dashboardScreen.dart';
 import 'services/navigation_service.dart';
 import 'services/Session.dart';
 
+
 void main() {
   runApp(const MyApp());
 }
 
+final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<void>>();
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+  
 
+  
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -26,6 +34,7 @@ class MyApp extends StatelessWidget {
         ),
       ),
       home: const prelogin(),
+      navigatorObservers: [routeObserver],
     );
   }
 }
