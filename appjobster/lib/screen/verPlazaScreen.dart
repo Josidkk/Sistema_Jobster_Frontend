@@ -750,7 +750,7 @@ Widget build(BuildContext context) {
                                                   child: Row(
                                                     crossAxisAlignment: CrossAxisAlignment.start,
                                                     children: [
-                                                      const Icon(Icons.arrow_right, color: Color(0xFFEE4D00), size: 24),
+                                                      const Icon(Icons.checklist_rtl_sharp, color: Color(0xFFEE4D00), size: 24),
                                                       const SizedBox(width: 6),
                                                       Expanded(
                                                         child: Column(

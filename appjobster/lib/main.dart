@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jobster/screen/principalPlazasScreen.dart';
+import 'package:jobster/screen/verGuardadosScreen';
 import 'screen/pre-login.dart';
 import 'screen/publicarPlazaScreen.dart';
 import 'screen/perfilScreen.dart';
@@ -43,6 +44,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     const PrincipalPlazasScreen(),
     // const Center(child: Text('Inicio')),
     const PublicarPlazaScreen(),
+    const VerGuardadosScreen(),
     const PerfilScreen(),
   ];
 
@@ -70,7 +72,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       if (tieneAccesoPublicar)
         const BottomNavigationBarItem(
             icon: Icon(Icons.control_point, size: 35), label: 'Publicar'),
+      
+      const BottomNavigationBarItem(icon: Icon(Icons.save_alt_rounded), label: 'Guardados' ),
       const BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
+      
     ];
 
     // Aseguramos que el índice seleccionado sea válido
