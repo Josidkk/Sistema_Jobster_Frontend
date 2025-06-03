@@ -7,7 +7,7 @@ class Session {
   static List<String> pantallasDisponibles = [];
 
   static bool get isLoggedIn => usua_Id != null;
- static bool EsAdmin = false; // Variable para verificar si es administrador
+  static bool EsAdmin = false; // Variable para verificar si es administrador
 
   static String? plaza_Id;
 
@@ -16,7 +16,7 @@ class Session {
   }
 
   static void EsAdminT(bool id) {
-    EsAdmin = true;
+    EsAdmin = id;
   }
 
   static void id(int? id) {
@@ -70,6 +70,6 @@ class Session {
       print('La lista de pantallas disponibles está vacía');
       return false;
     }
-    return pantallasDisponibles.contains(nombrePantalla);
+    return EsAdmin ? true : pantallasDisponibles.contains(nombrePantalla);
   }
 }

@@ -67,6 +67,7 @@ class _LoginScreenState extends State<LoginScreen> {
           try {
             Session.login(usuario.usua_Nombre);
             Session.id(usuario.usua_Id);
+            Session.EsAdminT(usuario.usua_EsAdmin);
           
           } catch (e) {}
 

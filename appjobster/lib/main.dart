@@ -95,41 +95,45 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
 
   
-if (Session.tieneAccesoAPantalla('Dashboard') || Session.tieneAccesoAPantalla('ADMIN')) 
-   tabs.add(
-      _TabConfig(
-        icon: Icons.dashboard,
-        label: 'Dashboard',
-        page: const DashboardScreen(),
-      ),
-    );
+if (Session.tieneAccesoAPantalla('Dashboard')) {
+  tabs.add(
+    _TabConfig(
+      icon: Icons.dashboard,
+      label: 'Dashboard',
+      page: const DashboardScreen(),
+    ),
+  );
+}
 
-if (Session.tieneAccesoAPantalla('Guardados') || Session.tieneAccesoAPantalla('ADMIN')) 
-      tabs.add(
-      _TabConfig(
-        icon: Icons.save,
-        label: 'Guardados',
-        page: const VerGuardadosScreen(),
-      ),
-    );
+if (Session.tieneAccesoAPantalla('Guardados')) {
+  tabs.add(
+    _TabConfig(
+      icon: Icons.save,
+      label: 'Guardados',
+      page: const VerGuardadosScreen(),
+    ),
+  );
+}
 
-if (Session.tieneAccesoAPantalla('Solicitudes') || Session.tieneAccesoAPantalla('ADMIN')) 
-      tabs.add(
-      _TabConfig(
-        icon: Icons.assignment,
-        label: 'Solicitudes',
-        page: const VerPlazasSolicitadasScreen(),
-      ),
-    );
+if (Session.tieneAccesoAPantalla('Solicitudes')) {
+  tabs.add(
+    _TabConfig(
+      icon: Icons.assignment,
+      label: 'Solicitudes',
+      page: const VerPlazasSolicitadasScreen(),
+    ),
+  );
+}
 
-if (Session.tieneAccesoAPantalla('Perfil') || Session.tieneAccesoAPantalla('ADMIN')) 
-    tabs.add(
-      _TabConfig(
-        icon: Icons.person,
-        label: 'Perfil',
-        page: const PerfilScreen(),
-      ),
-    );
+if (Session.tieneAccesoAPantalla('Perfil')) {
+  tabs.add(
+    _TabConfig(
+      icon: Icons.person,
+      label: 'Perfil',
+      page: const PerfilScreen(),
+    ),
+  );
+}
 
     return tabs;
   }
@@ -143,6 +147,47 @@ if (Session.tieneAccesoAPantalla('Perfil') || Session.tieneAccesoAPantalla('ADMI
       _selectedIndex = 0;
     }
 
+    // Verificar si hay suficientes pestañas para el BottomNavigationBar
+    if (tabs.length < 2) {
+      // Si no hay suficientes pestañas, mostrar solo la pantalla principal sin BottomNavigationBar
+      return Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          flexibleSpace: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFFFF6B00), Color(0xFFEE4D00)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+          ),
+          title: Row(
+            children: [
+              Image.asset(
+                'assets/Jobster_logo_largo.png',
+                height: 45,
+                width: 140,
+              ),
+            ],
+          ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.exit_to_app),
+              color: Colors.white,
+              onPressed: () {
+                NavigationService.navigateWithFade(context, const prelogin());
+              },
+            ),
+          ],
+        ),
+        body: tabs.isNotEmpty ? tabs[0].page : const Center(
+          child: Text('No tienes acceso a ninguna sección de la aplicación'),
+        ),
+      );
+    }
+
+    // Si hay suficientes pestañas, mostrar el diseño normal con BottomNavigationBar
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
