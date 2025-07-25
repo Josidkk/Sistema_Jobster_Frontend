@@ -10,6 +10,8 @@ class Session {
   static bool EsAdmin = false; // Variable para verificar si es administrador
 
   static String? plaza_Id;
+  
+  static int? role_Id;
 
   static void login(String id) {
     usua_Id = id;

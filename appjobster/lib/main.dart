@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jobster/screen/misPlazasScreen.dart';
 import 'package:jobster/screen/principalPlazasScreen.dart';
 
 import 'package:jobster/screen/verGuardadosScreen.dart';
@@ -72,7 +73,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       ),
     ];
 
-    if (Session.tieneAccesoAPantalla('Publicar')) {
+    if (Session.role_Id == 4 || Session.EsAdmin) {
       tabs.add(
         _TabConfig(
           icon: Icons.control_point,
@@ -82,7 +83,17 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       );
     }
 
-    if (Session.tieneAccesoAPantalla('Aprobaciones')) {
+    if (Session.role_Id == 4 || Session.EsAdmin) {
+      tabs.add(
+        _TabConfig(
+          icon: Icons.list_alt_sharp,
+          label: 'Mis Plazas',
+          page: const MisPlazasScreen(),
+        ),
+      );
+    }
+
+    if (Session.EsAdmin) {
       tabs.add(
         _TabConfig(
           icon: Icons.check_circle,
@@ -95,45 +106,47 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
 
   
-if (Session.tieneAccesoAPantalla('Dashboard')) {
+if (Session.tieneAccesoAPantalla('Dashboard') || Session.EsAdmin) 
+{
   tabs.add(
-    _TabConfig(
-      icon: Icons.dashboard,
-      label: 'Dashboard',
-      page: const DashboardScreen(),
-    ),
-  );
+      _TabConfig(
+        icon: Icons.dashboard,
+        label: 'Dashboard',
+        page: const DashboardScreen(),
+      ),
+    );
+}
+   
+
+if (Session.role_Id == 3 || Session.EsAdmin) {
+  tabs.add(
+      _TabConfig(
+        icon: Icons.save,
+        label: 'Guardados',
+        page: const VerGuardadosScreen(),
+      ),
+    );
 }
 
-if (Session.tieneAccesoAPantalla('Guardados')) {
+if (Session.role_Id == 3 || Session.EsAdmin) {
   tabs.add(
-    _TabConfig(
-      icon: Icons.save,
-      label: 'Guardados',
-      page: const VerGuardadosScreen(),
-    ),
-  );
+      _TabConfig(
+        icon: Icons.assignment,
+        label: 'Solicitudes',
+        page: const VerPlazasSolicitadasScreen(),
+      ),
+    );
 }
 
-if (Session.tieneAccesoAPantalla('Solicitudes')) {
-  tabs.add(
-    _TabConfig(
-      icon: Icons.assignment,
-      label: 'Solicitudes',
-      page: const VerPlazasSolicitadasScreen(),
-    ),
-  );
-}
 
-if (Session.tieneAccesoAPantalla('Perfil')) {
   tabs.add(
-    _TabConfig(
-      icon: Icons.person,
-      label: 'Perfil',
-      page: const PerfilScreen(),
-    ),
-  );
-}
+      _TabConfig(
+        icon: Icons.person,
+        label: 'Perfil',
+        page: const PerfilScreen(),
+      ),
+    );
+
 
     return tabs;
   }
